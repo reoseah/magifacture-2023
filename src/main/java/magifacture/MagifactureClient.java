@@ -14,7 +14,8 @@ public class MagifactureClient implements ClientModInitializer {
     public void onInitializeClient() {
         setupFluidTextures(ExperienceFluid.INSTANCE);
 
-        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), Magifacture.INFUSED_GLASS);
+        BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), //
+                Magifacture.INFUSED_GLASS);
     }
 
     private static void setupFluidTextures(Fluid fluid) {
