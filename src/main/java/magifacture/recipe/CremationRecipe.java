@@ -1,14 +1,14 @@
 package magifacture.recipe;
 
 import magifacture.block.entity.CrematoriumBlockEntity;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * TODO: implement fluid output
- */
 public abstract class CremationRecipe implements Recipe<Inventory> {
     public static final RecipeType<CremationRecipe> TYPE = new RecipeType<>() {
         @Override
@@ -21,7 +21,9 @@ public abstract class CremationRecipe implements Recipe<Inventory> {
 
     public abstract int getInputCount();
 
-    public abstract float getExperience(@Nullable CrematoriumBlockEntity inventory);
+    public abstract float getExperience(@Nullable Inventory inventory);
+
+    public abstract @Nullable ResourceAmount<FluidVariant> getFluid();
 
     @Override
     public boolean fits(int width, int height) {

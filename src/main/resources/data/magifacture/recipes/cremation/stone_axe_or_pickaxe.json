@@ -1,0 +1,23 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": [
+	{
+	  "item": "minecraft:stone_axe"
+	},
+	{
+	  "item": "minecraft:stone_pickaxe"
+	}
+  ],
+  "duration": 3000,
+  "result": {
+	"item": "magifacture:ash",
+	"count": 1
+  },
+  "fluid": {
+	"variant": {
+	  "fluid": "minecraft:lava"
+	},
+	"amount": 24300
+  },
+  "experience": 0
+}

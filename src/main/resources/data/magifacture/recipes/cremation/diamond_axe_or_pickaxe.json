@@ -1,0 +1,17 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": [
+	{
+	  "item": "minecraft:diamond_axe"
+	},
+	{
+	  "item": "minecraft:diamond_pickaxe"
+	}
+  ],
+  "duration": 300,
+  "result": {
+	"item": "magifacture:ash",
+	"count": 3
+  },
+  "experience": 0
+}

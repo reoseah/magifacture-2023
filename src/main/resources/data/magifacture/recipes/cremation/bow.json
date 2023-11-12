@@ -1,12 +1,12 @@
 {
   "type": "magifacture:cremation",
   "ingredient": {
-    "item": "minecraft:wooden_axe"
+	"item": "minecraft:bow"
   },
   "duration": 200,
   "result": {
-    "item": "magifacture:ash",
-    "count": 2
+	"item": "magifacture:ash",
+	"count": 2
   },
   "experience": 0
 }

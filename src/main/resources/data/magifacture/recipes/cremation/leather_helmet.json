@@ -1,0 +1,12 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": {
+	"item": "minecraft:leather_helmet"
+  },
+  "duration": 500,
+  "result": {
+	"item": "magifacture:ash",
+	"count": 5
+  },
+  "experience": 0
+}

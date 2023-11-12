@@ -1,0 +1,23 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": [
+	{
+	  "item": "minecraft:stone_sword"
+	},
+	{
+	  "item": "minecraft:stone_hoe"
+	}
+  ],
+  "duration": 2000,
+  "result": {
+	"item": "magifacture:ash",
+	"count": 1
+  },
+  "fluid": {
+	"variant": {
+	  "fluid": "minecraft:lava"
+	},
+	"amount": 16200
+  },
+  "experience": 0
+}

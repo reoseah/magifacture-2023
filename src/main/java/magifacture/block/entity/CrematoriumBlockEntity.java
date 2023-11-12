@@ -6,11 +6,12 @@ import magifacture.block.ExperienceBlock;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.CremationRecipe;
 import magifacture.screen.CrematoriumScreenHandler;
+import magifacture.util.FluidUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -33,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull"})
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull", "UnstableApiUsage"})
 public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedInventory {
     public static final BlockEntityType<CrematoriumBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(CrematoriumBlockEntity::new, CrematoriumBlock.INSTANCE).build();
     protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(4000 * 81, this::markDirty);
@@ -185,38 +186,32 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     }
 
     protected boolean canAcceptRecipeOutput(CremationRecipe recipe) {
-        return this.canFullyAddStack(OUTPUT_SLOT, recipe.getResult(this.world.getRegistryManager()));
+        return this.canFullyAddStack(OUTPUT_SLOT, recipe.getResult(this.world.getRegistryManager()))
+                && (recipe.getFluid() == null || FluidUtils.canFullyInsert(recipe.getFluid(), this.tank));
     }
 
     protected void craftRecipe(CremationRecipe recipe) {
         float experience = recipe.getExperience(this);
         BlockPos above = this.pos.up();
         if (this.world.getBlockState(above).isOf(AlembicBlock.INSTANCE)) {
-            int amount = MathHelper.floor(experience * ExperienceFluid.MILLIBUCKET_PER_XP * 81);
+            int experienceMb = MathHelper.floor(experience * ExperienceFluid.MILLIBUCKET_PER_XP * 81);
 
             BlockEntity be = this.world.getBlockEntity(above);
             if (be instanceof AlembicBlockEntity alembic //
                     && (alembic.tank.variant.getFluid() == ExperienceFluid.INSTANCE || alembic.tank.variant.isBlank())) {
-                int change = Math.min(amount, (int) (alembic.tank.getCapacity() - alembic.tank.amount));
-                if (change > 0) {
-                    if (alembic.tank.variant.isBlank()) {
-                        alembic.tank.variant = FluidVariant.of(ExperienceFluid.INSTANCE);
-                    }
-                    alembic.tank.amount += change;
-                    alembic.tank.afterOuterClose(TransactionContext.Result.COMMITTED);
-                    amount -= change;
-                }
-            }
+                long change = FluidUtils.insert(new ResourceAmount<>(FluidVariant.of(ExperienceFluid.INSTANCE), experienceMb), alembic.tank);
 
-            if (amount > 0) {
-                dropExperience(this.world, above.up(), this.world.random, probabilityRound(amount / (float) ExperienceFluid.MILLIBUCKET_PER_XP / 81, this.world.random));
+                if (change < experienceMb) {
+                    dropExperience(this.world, above.up(), this.world.random, probabilityRound((experienceMb - change) / (float) ExperienceFluid.MILLIBUCKET_PER_XP / 81F, this.world.random));
+                }
             }
         } else {
             dropExperience(this.world, above, this.world.random, probabilityRound(experience, this.world.random));
         }
 
         this.addStack(OUTPUT_SLOT, recipe.craft(this, this.world.getRegistryManager()));
-        // TODO add fluid to tank
+
+        FluidUtils.insert(recipe.getFluid(), this.tank);
 
         ItemStack input = this.slots.get(INPUT_SLOT);
         input.decrement(recipe.getInputCount());

@@ -1,0 +1,12 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": {
+	"item": "minecraft:leather_chestplate"
+  },
+  "duration": 800,
+  "result": {
+	"item": "magifacture:ash",
+	"count": 8
+  },
+  "experience": 0
+}

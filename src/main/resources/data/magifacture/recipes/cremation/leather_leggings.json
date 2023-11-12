@@ -1,0 +1,12 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": {
+	"item": "minecraft:leather_leggings"
+  },
+  "duration": 700,
+  "result": {
+	"item": "magifacture:ash",
+	"count": 7
+  },
+  "experience": 0
+}

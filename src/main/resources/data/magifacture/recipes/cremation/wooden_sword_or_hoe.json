@@ -1,0 +1,17 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": [
+	{
+	  "item": "minecraft:wooden_how"
+	},
+	{
+	  "item": "minecraft:wooden_sword"
+	}
+  ],
+  "duration": 200,
+  "result": {
+	"item": "magifacture:ash",
+	"count": 2
+  },
+  "experience": 0
+}

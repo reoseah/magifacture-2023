@@ -1,0 +1,12 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": {
+	"item": "minecraft:leather_boots"
+  },
+  "duration": 400,
+  "result": {
+	"item": "magifacture:ash",
+	"count": 4
+  },
+  "experience": 0
+}
