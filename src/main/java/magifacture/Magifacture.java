@@ -2,6 +2,7 @@ package magifacture;
 
 import magifacture.block.AlembicBlock;
 import magifacture.block.ExperienceBlock;
+import magifacture.block.TerraEnchanterBlock;
 import magifacture.block.entity.AlembicBlockEntity;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.item.ExperienceBucketItem;
@@ -41,6 +42,7 @@ public class Magifacture implements ModInitializer {
 
         Registry.register(Registries.BLOCK, "magifacture:experience", ExperienceBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:alembic", AlembicBlock.INSTANCE);
+        Registry.register(Registries.BLOCK, "magifacture:terra_enchanter", TerraEnchanterBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:infused_stone", INFUSED_STONE);
         Registry.register(Registries.BLOCK, "magifacture:magic_crystal_ore", MAGIC_CRYSTAL_ORE);
         Registry.register(Registries.BLOCK, "magifacture:infused_glass", INFUSED_GLASS);
@@ -53,6 +55,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.FLUID, "magifacture:experience", ExperienceFluid.INSTANCE);
 
         Registry.register(Registries.ITEM, "magifacture:alembic", AlembicBlock.ITEM);
+        Registry.register(Registries.ITEM, "magifacture:terra_enchanter", TerraEnchanterBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:infused_stone", new BlockItem(INFUSED_STONE, new Item.Settings()));
         Registry.register(Registries.ITEM, "magifacture:magic_crystal_ore", new BlockItem(MAGIC_CRYSTAL_ORE, new Item.Settings().rarity(Rarity.UNCOMMON)));
         Registry.register(Registries.ITEM, "magifacture:infused_glass", new BlockItem(INFUSED_GLASS, new Item.Settings()));
@@ -66,6 +69,7 @@ public class Magifacture implements ModInitializer {
                 .icon(() -> new ItemStack(Magifacture.MAGIC_CRYSTAL_BLOCK)) //
                 .entries((parameters, entries) -> { //
                     entries.add(AlembicBlock.INSTANCE);
+                    entries.add(TerraEnchanterBlock.INSTANCE);
                     entries.add(INFUSED_STONE);
                     entries.add(MAGIC_CRYSTAL_ORE);
                     entries.add(INFUSED_GLASS);

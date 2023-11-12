@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+	"IBI",
+	"BEB",
+	"###"
+  ],
+  "key": {
+	"#": {
+	  "item": "minecraft:cobblestone"
+	},
+	"I": {
+	  "item": "minecraft:iron_ingot"
+	},
+	"B": {
+	  "item": "minecraft:iron_bars"
+	},
+	"E": {
+	  "tag": "c:experience_buckets"
+	}
+  },
+  "result": {
+	"item": "magifacture:terra_enchanter"
+  }
+}
