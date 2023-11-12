@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,lit=false": {
+      "model": "magifacture:block/crematorium",
+      "y": 90
+    },
+    "facing=east,lit=true": {
+      "model": "magifacture:block/crematorium_on",
+      "y": 90
+    },
+    "facing=north,lit=false": {
+      "model": "magifacture:block/crematorium"
+    },
+    "facing=north,lit=true": {
+      "model": "magifacture:block/crematorium_on"
+    },
+    "facing=south,lit=false": {
+      "model": "magifacture:block/crematorium",
+      "y": 180
+    },
+    "facing=south,lit=true": {
+      "model": "magifacture:block/crematorium_on",
+      "y": 180
+    },
+    "facing=west,lit=false": {
+      "model": "magifacture:block/crematorium",
+      "y": 270
+    },
+    "facing=west,lit=true": {
+      "model": "magifacture:block/crematorium_on",
+      "y": 270
+    }
+  }
+}

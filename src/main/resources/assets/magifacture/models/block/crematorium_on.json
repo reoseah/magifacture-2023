@@ -1,0 +1,18 @@
+{
+  "parent": "block/cube",
+  "display": {
+    "firstperson_righthand": {
+      "rotation": [ 0, 135, 0 ],
+      "scale": [ 0.40, 0.40, 0.40 ]
+    }
+  },
+  "textures": {
+    "particle": "magifacture:block/crematorium_front_on",
+    "down": "magifacture:block/crematorium_bottom",
+    "up": "magifacture:block/crematorium_top",
+    "north": "magifacture:block/crematorium_front_on",
+    "east": "magifacture:block/crematorium_left",
+    "south": "magifacture:block/crematorium_back",
+    "west": "magifacture:block/crematorium_right"
+  }
+}

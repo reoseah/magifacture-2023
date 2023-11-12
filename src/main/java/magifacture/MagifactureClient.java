@@ -3,6 +3,8 @@ package magifacture;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.screen.AlembicScreen;
 import magifacture.screen.AlembicScreenHandler;
+import magifacture.screen.CrematoriumScreen;
+import magifacture.screen.CrematoriumScreenHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
@@ -21,6 +23,7 @@ public class MagifactureClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), //
                 Magifacture.INFUSED_GLASS);
 
+        HandledScreens.register(CrematoriumScreenHandler.TYPE, CrematoriumScreen::new);
         HandledScreens.register(AlembicScreenHandler.TYPE, AlembicScreen::new);
     }
 

@@ -2,7 +2,7 @@ package magifacture.screen;
 
 import lombok.Getter;
 import magifacture.block.entity.AlembicBlockEntity;
-import magifacture.block.entity.FluidUtils;
+import magifacture.util.FluidUtils;
 import magifacture.screen.slot.MagifactureOutputSlot;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.entity.player.PlayerInventory;

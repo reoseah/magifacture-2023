@@ -1,22 +1,24 @@
-package reoseah.magifacture.screen;
+package magifacture.screen;
 
+import magifacture.util.FluidUtils;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
+import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.world.World;
-import reoseah.magifacture.block.entity.CrematoriumBlockEntity;
-import reoseah.magifacture.screen.slot.MagifactureFuelSlot;
-import reoseah.magifacture.screen.slot.MagifactureOutputSlot;
-import reoseah.magifacture.util.FluidUtils;
+import magifacture.block.entity.CrematoriumBlockEntity;
+import magifacture.screen.slot.MagifactureFuelSlot;
+import magifacture.screen.slot.MagifactureOutputSlot;
 
 public class CrematoriumScreenHandler extends MagifactureScreenHandler {
-    public static final ScreenHandlerType<CrematoriumScreenHandler> TYPE = new ScreenHandlerType<>(CrematoriumScreenHandler::new);
+    public static final ScreenHandlerType<CrematoriumScreenHandler> TYPE = new ScreenHandlerType<>(CrematoriumScreenHandler::new, FeatureFlags.VANILLA_FEATURES);
     public final PropertyDelegate properties;
     public final SingleFluidStorage tank;
 
@@ -70,6 +72,8 @@ public class CrematoriumScreenHandler extends MagifactureScreenHandler {
         if (slot >= this.inventory.size()) {
             if (FluidUtils.canFillItem(stack, this.tank.variant.getFluid())) {
                 return CrematoriumBlockEntity.EMPTY_SLOT;
+            } else if (AbstractFurnaceBlockEntity.canUseAsFuel(stack)) {
+                return CrematoriumBlockEntity.FUEL_SLOT;
             }
         }
         return super.getPreferredQuickMoveSlot(stack, world, slot);

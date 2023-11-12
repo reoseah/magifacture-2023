@@ -4,6 +4,7 @@ import magifacture.block.AlembicBlock;
 import magifacture.block.ExperienceBlock;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.screen.AlembicScreenHandler;
+import magifacture.util.FluidUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;

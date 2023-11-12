@@ -62,12 +62,6 @@ public class Magifacture implements ModInitializer {
 //            entries.add(MagifactureItems.ASH);
 //            entries.add(MagelightBlock.ITEM);
 //        });
-        CompostingChanceRegistry.INSTANCE.add(MagifactureItems.ASH, 0.05F);
-        // noinspection UnstableApiUsage
-        FluidStorage.combinedItemApiProvider(Items.GLASS_BOTTLE).register(context -> new EmptyItemFluidStorage(context, Items.EXPERIENCE_BOTTLE, ExperienceFluid.INSTANCE, FluidConstants.BOTTLE));
-        // noinspection UnstableApiUsage
-        FluidStorage.combinedItemApiProvider(Items.EXPERIENCE_BOTTLE).register(context -> new FullItemFluidStorage(context, Items.GLASS_BOTTLE, FluidVariant.of(ExperienceFluid.INSTANCE), FluidConstants.BOTTLE));
-        // noinspection UnstableApiUsage
 
     }
 }

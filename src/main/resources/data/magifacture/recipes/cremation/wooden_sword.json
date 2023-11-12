@@ -1,0 +1,12 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": {
+    "item": "minecraft:wooden_sword"
+  },
+  "duration": 200,
+  "result": {
+    "item": "magifacture:wooden_sword",
+    "count": 2
+  },
+  "experience": 0
+}

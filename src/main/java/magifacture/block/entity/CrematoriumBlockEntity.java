@@ -1,5 +1,11 @@
-package reoseah.magifacture.block.entity;
+package magifacture.block.entity;
 
+import magifacture.block.AlembicBlock;
+import magifacture.block.CrematoriumBlock;
+import magifacture.block.ExperienceBlock;
+import magifacture.fluid.ExperienceFluid;
+import magifacture.recipe.CremationRecipe;
+import magifacture.screen.CrematoriumScreenHandler;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -14,6 +20,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.collection.DefaultedList;
@@ -23,12 +30,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import reoseah.magifacture.block.AlembicBlock;
-import reoseah.magifacture.block.CrematoriumBlock;
-import reoseah.magifacture.block.ExperienceBlock;
-import reoseah.magifacture.fluid.ExperienceFluid;
-import reoseah.magifacture.recipe.CremationRecipe;
-import reoseah.magifacture.screen.CrematoriumScreenHandler;
 
 import java.util.Optional;
 
@@ -136,7 +137,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
             return null;
         }
         if (this.cachedRecipe == null && !this.slots.get(0).isEmpty()) {
-            Optional<? extends CremationRecipe> recipe = world.getRecipeManager().getFirstMatch(CremationRecipe.TYPE, this, world);
+            Optional<? extends CremationRecipe> recipe = world.getRecipeManager().getFirstMatch(CremationRecipe.TYPE, this, world).map(RecipeEntry::value);
             if (recipe.isPresent()) {
                 this.cachedRecipe = recipe;
             }
@@ -184,7 +185,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     }
 
     protected boolean canAcceptRecipeOutput(CremationRecipe recipe) {
-        return this.canFullyAddStack(OUTPUT_SLOT, recipe.getOutput());
+        return this.canFullyAddStack(OUTPUT_SLOT, recipe.getResult(this.world.getRegistryManager()));
     }
 
     protected void craftRecipe(CremationRecipe recipe) {
@@ -214,7 +215,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
             dropExperience(this.world, above, this.world.random, probabilityRound(experience, this.world.random));
         }
 
-        this.addStack(OUTPUT_SLOT, recipe.craft(this));
+        this.addStack(OUTPUT_SLOT, recipe.craft(this, this.world.getRegistryManager()));
         // TODO add fluid to tank
 
         ItemStack input = this.slots.get(INPUT_SLOT);
@@ -223,7 +224,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     }
 
     private static int probabilityRound(float value, Random random) {
-        return ((int) value) +  random.nextFloat() <= ((value - (int) value)) ? 1 : 0;
+        return ((int) value) + random.nextFloat() <= ((value - (int) value)) ? 1 : 0;
     }
 
     public static void dropExperience(World world, BlockPos pos, Random random, int xp) {

@@ -1,4 +1,4 @@
-package magifacture.screen;
+package magifacture.util;
 
 import magifacture.mixin.FluidAccessor;
 import net.fabricmc.api.EnvType;

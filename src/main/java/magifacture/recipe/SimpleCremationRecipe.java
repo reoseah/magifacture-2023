@@ -1,20 +1,20 @@
-package reoseah.magifacture.recipe;
+package magifacture.recipe;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import magifacture.block.entity.CrematoriumBlockEntity;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.RecipeCodecs;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.ShapedRecipe;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import reoseah.magifacture.block.entity.CrematoriumBlockEntity;
 
 import java.util.Map;
 
@@ -22,19 +22,18 @@ public class SimpleCremationRecipe extends CremationRecipe {
     public static final RecipeSerializer<?> SERIALIZER = new Serializer(200);
     public final Ingredient ingredient;
     public final int count;
-    public final ItemStack output;
+    public final ItemStack result;
     public final int duration;
     public final float experience;
-    public final boolean scaleOutputByDurability;
+    public final boolean scaleOutputByDurability = true;
 
-    public SimpleCremationRecipe(Identifier id, Ingredient ingredient, int count, ItemStack output, int duration, float experience, boolean scaleOutputByDurability) {
-        super(id);
+    public SimpleCremationRecipe(Ingredient ingredient, int count, ItemStack result, int duration, float experience) {
+        super();
         this.ingredient = ingredient;
         this.count = count;
-        this.output = output;
+        this.result = result;
         this.duration = duration;
         this.experience = experience;
-        this.scaleOutputByDurability = scaleOutputByDurability;
     }
 
     @Override
@@ -43,25 +42,25 @@ public class SimpleCremationRecipe extends CremationRecipe {
     }
 
     @Override
-    public ItemStack craft(Inventory inventory) {
+    public ItemStack craft(Inventory inventory, DynamicRegistryManager registryManager) {
         if (this.scaleOutputByDurability) {
             ItemStack input = inventory.getStack(0);
             if (input.isDamaged()) {
                 double durability = 1 - (double) input.getDamage() / (double) input.getMaxDamage();
-                int outputCount = Math.min(1, MathHelper.floor(durability * this.output.getCount()));
+                int outputCount = Math.max(1, MathHelper.floor(durability * this.result.getCount()));
 
-                ItemStack copy = this.output.copy();
+                ItemStack copy = this.result.copy();
                 copy.setCount(outputCount);
 
                 return copy;
             }
         }
-        return this.output.copy();
+        return this.result.copy();
     }
 
     @Override
-    public ItemStack getOutput() {
-        return this.output;
+    public ItemStack getResult(DynamicRegistryManager registryManager) {
+        return this.result;
     }
 
     @Override
@@ -97,44 +96,41 @@ public class SimpleCremationRecipe extends CremationRecipe {
     }
 
     public static class Serializer implements RecipeSerializer<SimpleCremationRecipe> {
-        protected final int defaultDuration;
+        private final Codec<SimpleCremationRecipe> codec;
 
         public Serializer(int defaultDuration) {
-            this.defaultDuration = defaultDuration;
+            this.codec = RecordCodecBuilder.create(instance -> instance.group(
+                    Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
+                    Codec.INT.fieldOf("count").orElse(1).forGetter(recipe -> recipe.count),
+                    RecipeCodecs.CRAFTING_RESULT.fieldOf("result").forGetter(recipe -> recipe.result),
+                    Codec.INT.fieldOf("duration").orElse(defaultDuration).forGetter(recipe -> recipe.duration),
+                    Codec.FLOAT.fieldOf("experience").orElse(0.0F).forGetter(recipe -> recipe.experience)
+            ).apply(instance, SimpleCremationRecipe::new));
         }
 
         @Override
-        public SimpleCremationRecipe read(Identifier id, JsonObject json) {
-            Ingredient ingredient = Ingredient.fromJson(json.get("ingredient"));
-            int count = JsonHelper.hasJsonObject(json, "ingredient") ? JsonHelper.getInt(JsonHelper.getObject(json, "ingredient"), "count", 1) : 1;
-            ItemStack output = ShapedRecipe.outputFromJson(JsonHelper.getObject(json, "result"));
-            int duration = JsonHelper.getInt(json, "duration", this.defaultDuration);
-            float experience = JsonHelper.getFloat(json, "experience", 0F);
-            boolean scaleOutputByDurability = JsonHelper.getBoolean(json, "scale_output_by_durability", true);
-
-            return new SimpleCremationRecipe(id, ingredient, count, output, duration, experience, scaleOutputByDurability);
+        public Codec<SimpleCremationRecipe> codec() {
+            return this.codec;
         }
 
         @Override
-        public SimpleCremationRecipe read(Identifier id, PacketByteBuf buf) {
+        public SimpleCremationRecipe read(PacketByteBuf buf) {
             Ingredient ingredient = Ingredient.fromPacket(buf);
             int count = buf.readVarInt();
             ItemStack result = buf.readItemStack();
             int duration = buf.readVarInt();
             float experience = buf.readFloat();
-            boolean scaleOutputByDurability = buf.readBoolean();
 
-            return new SimpleCremationRecipe(id, ingredient, count, result, duration, experience, scaleOutputByDurability);
+            return new SimpleCremationRecipe(ingredient, count, result, duration, experience);
         }
 
         @Override
         public void write(PacketByteBuf buf, SimpleCremationRecipe recipe) {
             recipe.ingredient.write(buf);
             buf.writeVarInt(recipe.count);
-            buf.writeItemStack(recipe.output);
+            buf.writeItemStack(recipe.result);
             buf.writeVarInt(recipe.duration);
             buf.writeFloat(recipe.experience);
-            buf.writeBoolean(recipe.scaleOutputByDurability);
         }
     }
 }

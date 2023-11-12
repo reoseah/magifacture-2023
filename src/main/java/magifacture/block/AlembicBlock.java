@@ -41,6 +41,6 @@ public class AlembicBlock extends MagifactureBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient ? null : validateTicker(type, AlembicBlockEntity.TYPE, AlembicBlockEntity::tickServer);
+        return world.isClient ? null : BlockWithEntity.validateTicker(type, AlembicBlockEntity.TYPE, AlembicBlockEntity::tickServer);
     }
 }

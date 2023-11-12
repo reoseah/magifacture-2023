@@ -1,4 +1,4 @@
-package magifacture.block.entity;
+package magifacture.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;

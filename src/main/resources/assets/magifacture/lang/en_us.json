@@ -1,6 +1,7 @@
 {
   "itemGroup.magifacture": "Magifacture",
   "block.magifacture.experience": "Magic Essence",
+  "block.magifacture.crematorium": "Crematorium",
   "block.magifacture.alembic": "Arcane Alembic",
   "block.magifacture.terra_enchanter": "Terra Enchanter",
   "block.magifacture.infused_stone": "Infused Stone",
@@ -9,6 +10,7 @@
   "block.magifacture.infused_glass": "Infused Glass",
   "block.magifacture.highly_infused_glass": "Highly Infused Glass",
   "item.magifacture.experience_bucket": "Bucket of Magic Essence",
+  "item.magifacture.ash": "Ash",
   "fluid.minecraft.empty": "Empty",
   "magifacture.amount_and_capacity": "%s / %s",
   "magifacture.millibucket.amount": "%s mB",

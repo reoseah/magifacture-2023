@@ -76,7 +76,7 @@ public abstract class MagifactureBlock extends BlockWithEntity {
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         if (this.getDefaultState().contains(Properties.HORIZONTAL_FACING)) {
-            return this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerLookDirection().getOpposite());
+            return this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getHorizontalPlayerFacing().getOpposite());
         }
         return this.getDefaultState();
     }

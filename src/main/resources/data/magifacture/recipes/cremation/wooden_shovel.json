@@ -1,0 +1,11 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": {
+    "item": "minecraft:wooden_shovel"
+  },
+  "duration": 100,
+  "result": {
+    "item": "magifacture:ash"
+  },
+  "experience": 0
+}
