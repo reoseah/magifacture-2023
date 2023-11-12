@@ -1,5 +1,6 @@
-package magifacture;
+package magifacture.item;
 
+import magifacture.fluid.ExperienceFluid;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.*;

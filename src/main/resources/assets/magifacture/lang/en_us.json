@@ -1,10 +1,16 @@
 {
   "itemGroup.magifacture": "Magifacture",
   "block.magifacture.experience": "Magic Essence",
+  "block.magifacture.alembic": "Arcane Alembic",
   "block.magifacture.infused_stone": "Infused Stone",
   "block.magifacture.magic_crystal_ore": "Magic Crystal Ore",
   "block.magifacture.magic_crystal_block": "Block of Magic Crystal",
   "block.magifacture.infused_glass": "Infused Glass",
   "block.magifacture.highly_infused_glass": "Highly Infused Glass",
-  "item.magifacture.experience_bucket": "Bucket of Magic Essence"
+  "item.magifacture.experience_bucket": "Bucket of Magic Essence",
+  "fluid.minecraft.empty": "Empty",
+  "magifacture.amount_and_capacity": "%s / %s",
+  "magifacture.millibucket.amount": "%s mB",
+  "magifacture.millibucket.less_than_1": "<1 mB",
+  "magifacture.bucket.amount": "%s B"
 }

@@ -3,6 +3,10 @@
   "package": "magifacture.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+	"AccessibleBucketItem",
+	"AccessibleEmptyItemFluidStorage",
+	"AccessibleFullItemFluidStorage",
+	"FluidAccessor"
   ],
   "injectors": {
 	"defaultRequire": 1

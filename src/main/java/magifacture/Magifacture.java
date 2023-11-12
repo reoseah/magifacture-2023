@@ -1,7 +1,14 @@
 package magifacture;
 
+import magifacture.block.AlembicBlock;
+import magifacture.block.ExperienceBlock;
+import magifacture.block.entity.AlembicBlockEntity;
+import magifacture.fluid.ExperienceFluid;
+import magifacture.item.ExperienceBucketItem;
+import magifacture.screen.AlembicScreenHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.GlassBlock;
@@ -15,6 +22,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.math.Direction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,14 +40,19 @@ public class Magifacture implements ModInitializer {
         LOGGER.info("Initializing...");
 
         Registry.register(Registries.BLOCK, "magifacture:experience", ExperienceBlock.INSTANCE);
+        Registry.register(Registries.BLOCK, "magifacture:alembic", AlembicBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:infused_stone", INFUSED_STONE);
         Registry.register(Registries.BLOCK, "magifacture:magic_crystal_ore", MAGIC_CRYSTAL_ORE);
         Registry.register(Registries.BLOCK, "magifacture:infused_glass", INFUSED_GLASS);
         Registry.register(Registries.BLOCK, "magifacture:highly_infused_glass", HIGHLY_INFUSED_GLASS);
         Registry.register(Registries.BLOCK, "magifacture:magic_crystal_block", MAGIC_CRYSTAL_BLOCK);
 
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:alembic", AlembicBlockEntity.TYPE);
+        FluidStorage.SIDED.registerForBlockEntity((be, side) -> side != Direction.UP ? be.getTank() : null, AlembicBlockEntity.TYPE);
+
         Registry.register(Registries.FLUID, "magifacture:experience", ExperienceFluid.INSTANCE);
 
+        Registry.register(Registries.ITEM, "magifacture:alembic", AlembicBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:infused_stone", new BlockItem(INFUSED_STONE, new Item.Settings()));
         Registry.register(Registries.ITEM, "magifacture:magic_crystal_ore", new BlockItem(MAGIC_CRYSTAL_ORE, new Item.Settings().rarity(Rarity.UNCOMMON)));
         Registry.register(Registries.ITEM, "magifacture:infused_glass", new BlockItem(INFUSED_GLASS, new Item.Settings()));
@@ -52,6 +65,7 @@ public class Magifacture implements ModInitializer {
                 .displayName(Text.translatable("itemGroup.magifacture")) //
                 .icon(() -> new ItemStack(Magifacture.MAGIC_CRYSTAL_BLOCK)) //
                 .entries((parameters, entries) -> { //
+                    entries.add(AlembicBlock.INSTANCE);
                     entries.add(INFUSED_STONE);
                     entries.add(MAGIC_CRYSTAL_ORE);
                     entries.add(INFUSED_GLASS);
@@ -63,5 +77,6 @@ public class Magifacture implements ModInitializer {
                 .build();
         Registry.register(Registries.ITEM_GROUP, "magifacture:main", itemGroup);
 
+        Registry.register(Registries.SCREEN_HANDLER, "magifacture:alembic", AlembicScreenHandler.TYPE);
     }
 }

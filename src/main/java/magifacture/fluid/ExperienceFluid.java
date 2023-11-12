@@ -1,5 +1,7 @@
-package magifacture;
+package magifacture.fluid;
 
+import magifacture.item.ExperienceBucketItem;
+import magifacture.block.ExperienceBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
