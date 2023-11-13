@@ -10,6 +10,7 @@
   "block.magifacture.infused_glass": "Infused Glass",
   "block.magifacture.highly_infused_glass": "Highly Infused Glass",
   "item.magifacture.experience_bucket": "Bucket of Magic Essence",
+  "item.magifacture.molten_gold_bucket": "Bucket of Molten Gold",
   "item.magifacture.ash": "Ash",
   "fluid.minecraft.empty": "Empty",
   "magifacture.amount_and_capacity": "%s / %s",

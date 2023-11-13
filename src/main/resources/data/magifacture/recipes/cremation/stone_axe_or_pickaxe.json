@@ -8,11 +8,7 @@
 	  "item": "minecraft:stone_pickaxe"
 	}
   ],
-  "duration": 3000,
-  "result": {
-	"item": "magifacture:ash",
-	"count": 1
-  },
+  "duration": 600,
   "fluid": {
 	"variant": {
 	  "fluid": "minecraft:lava"

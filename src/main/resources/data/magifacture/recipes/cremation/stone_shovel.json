@@ -3,11 +3,7 @@
   "ingredient": {
     "item": "minecraft:stone_shovel"
   },
-  "duration": 1000,
-  "result": {
-    "item": "magifacture:ash",
-    "count": 1
-  },
+  "duration": 200,
   "fluid": {
     "variant": {
       "fluid": "minecraft:lava"

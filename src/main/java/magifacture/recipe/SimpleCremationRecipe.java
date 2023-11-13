@@ -113,7 +113,7 @@ public class SimpleCremationRecipe extends CremationRecipe {
             this.codec = RecordCodecBuilder.create(instance -> instance.group(
                     Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
                     Codec.INT.fieldOf("count").orElse(1).forGetter(recipe -> recipe.count),
-                    RecipeCodecs.CRAFTING_RESULT.fieldOf("result").forGetter(recipe -> recipe.result),
+                    RecipeCodecs.CRAFTING_RESULT.fieldOf("result").orElse(ItemStack.EMPTY).forGetter(recipe -> recipe.result),
                     Codec.INT.fieldOf("duration").orElse(defaultDuration).forGetter(recipe -> recipe.duration),
                     Codec.FLOAT.fieldOf("experience").orElse(0.0F).forGetter(recipe -> recipe.experience),
                     FluidUtils.FLUID_AMOUNT_CODEC.optionalFieldOf("fluid").forGetter(recipe -> Optional.ofNullable(recipe.fluid))

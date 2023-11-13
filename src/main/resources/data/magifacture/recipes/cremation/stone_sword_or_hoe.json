@@ -8,11 +8,7 @@
 	  "item": "minecraft:stone_hoe"
 	}
   ],
-  "duration": 2000,
-  "result": {
-	"item": "magifacture:ash",
-	"count": 1
-  },
+  "duration": 400,
   "fluid": {
 	"variant": {
 	  "fluid": "minecraft:lava"
