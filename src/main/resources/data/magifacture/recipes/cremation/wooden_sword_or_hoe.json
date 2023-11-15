@@ -2,10 +2,10 @@
   "type": "magifacture:cremation",
   "ingredient": [
 	{
-	  "item": "minecraft:wooden_how"
+	  "item": "minecraft:wooden_sword"
 	},
 	{
-	  "item": "minecraft:wooden_sword"
+	  "item": "minecraft:wooden_hoe"
 	}
   ],
   "duration": 200,

@@ -1,0 +1,22 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": [
+	{
+	  "item": "minecraft:golden_sword"
+	},
+	{
+	  "item": "minecraft:golden_hoe"
+	}
+  ],
+  "duration": 400,
+  "result": {
+	"item": "magifacture:ash"
+  },
+  "fluid": {
+	"variant": {
+	  "fluid": "magifacture:molten_gold"
+	},
+	"amount": 18000
+  },
+  "experience": 0
+}

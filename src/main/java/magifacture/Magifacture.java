@@ -7,6 +7,7 @@ import magifacture.block.TerraEnchanterBlock;
 import magifacture.block.entity.AlembicBlockEntity;
 import magifacture.block.entity.CrematoriumBlockEntity;
 import magifacture.fluid.ExperienceFluid;
+import magifacture.fluid.MoltenGoldFluid;
 import magifacture.item.ExperienceBucketItem;
 import magifacture.recipe.CremationRecipe;
 import magifacture.recipe.SimpleCremationRecipe;
@@ -20,10 +21,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.EmptyItemFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.FullItemFluidStorage;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.GlassBlock;
-import net.minecraft.block.MapColor;
+import net.minecraft.block.*;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -37,12 +35,15 @@ import org.slf4j.LoggerFactory;
 public class Magifacture implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("magifacture");
 
+    public static final Block MOLTEN_GOLD = new FluidBlock(MoltenGoldFluid.Still.INSTANCE, AbstractBlock.Settings.create().mapColor(MapColor.BRIGHT_RED).strength(100F).dropsNothing());
+
     public static final Block INFUSED_STONE = new Block(AbstractBlock.Settings.create().mapColor(MapColor.PURPLE).strength(2F));
     public static final Block MAGIC_CRYSTAL_ORE = new Block(AbstractBlock.Settings.create().mapColor(MapColor.MAGENTA).strength(3F).luminance(state -> 10));
     public static final Block INFUSED_GLASS = new GlassBlock(AbstractBlock.Settings.create().mapColor(MapColor.MAGENTA).strength(2F).luminance(state -> 10).nonOpaque().sounds(BlockSoundGroup.GLASS));
     public static final Block HIGHLY_INFUSED_GLASS = new Block(AbstractBlock.Settings.create().mapColor(MapColor.PINK).strength(2F).luminance(state -> 14).nonOpaque().sounds(BlockSoundGroup.GLASS));
     public static final Block MAGIC_CRYSTAL_BLOCK = new Block(AbstractBlock.Settings.create().mapColor(MapColor.YELLOW).strength(3F, 5F).luminance(state -> 15).sounds(BlockSoundGroup.AMETHYST_BLOCK));
 
+    public static final Item MOLTEN_GOLD_BUCKET = new BucketItem(MoltenGoldFluid.Still.INSTANCE, new Item.Settings());
     public static final Item ASH = new Item(new Item.Settings());
 
     @Override
@@ -50,6 +51,7 @@ public class Magifacture implements ModInitializer {
         LOGGER.info("Initializing...");
 
         Registry.register(Registries.BLOCK, "magifacture:experience", ExperienceBlock.INSTANCE);
+        Registry.register(Registries.BLOCK, "magifacture:molten_gold", MOLTEN_GOLD);
         Registry.register(Registries.BLOCK, "magifacture:crematorium", CrematoriumBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:alembic", AlembicBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:terra_enchanter", TerraEnchanterBlock.INSTANCE);
@@ -64,6 +66,8 @@ public class Magifacture implements ModInitializer {
         FluidStorage.SIDED.registerForBlockEntity((be, side) -> side != Direction.UP ? be.getTank() : null, AlembicBlockEntity.TYPE);
 
         Registry.register(Registries.FLUID, "magifacture:experience", ExperienceFluid.INSTANCE);
+        Registry.register(Registries.FLUID, "magifacture:molten_gold", MoltenGoldFluid.Still.INSTANCE);
+        Registry.register(Registries.FLUID, "magifacture:flowing_molten_gold", MoltenGoldFluid.Flowing.INSTANCE);
 
         Registry.register(Registries.ITEM, "magifacture:crematorium", CrematoriumBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:alembic", AlembicBlock.ITEM);
@@ -75,6 +79,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.ITEM, "magifacture:magic_crystal_block", new BlockItem(MAGIC_CRYSTAL_BLOCK, new Item.Settings().rarity(Rarity.RARE)));
 
         Registry.register(Registries.ITEM, "magifacture:experience_bucket", ExperienceBucketItem.INSTANCE);
+        Registry.register(Registries.ITEM, "magifacture:molten_gold_bucket", MOLTEN_GOLD_BUCKET);
         Registry.register(Registries.ITEM, "magifacture:ash", ASH);
 
         CompostingChanceRegistry.INSTANCE.add(ASH, 0.05F);
@@ -98,6 +103,7 @@ public class Magifacture implements ModInitializer {
                     entries.add(MAGIC_CRYSTAL_BLOCK);
 
                     entries.add(ExperienceBucketItem.INSTANCE);
+                    entries.add(MOLTEN_GOLD_BUCKET);
                     entries.add(ASH);
                 }) //
                 .build();
@@ -109,6 +115,5 @@ public class Magifacture implements ModInitializer {
 
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:crematorium", CrematoriumScreenHandler.TYPE);
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:alembic", AlembicScreenHandler.TYPE);
-
     }
 }

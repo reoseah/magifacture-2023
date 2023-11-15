@@ -1,6 +1,7 @@
 package magifacture;
 
 import magifacture.fluid.ExperienceFluid;
+import magifacture.fluid.MoltenGoldFluid;
 import magifacture.screen.AlembicScreen;
 import magifacture.screen.AlembicScreenHandler;
 import magifacture.screen.CrematoriumScreen;
@@ -18,7 +19,9 @@ import net.minecraft.util.Identifier;
 public class MagifactureClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        setupFluidTextures(ExperienceFluid.INSTANCE);
+        setupFluidTextures(ExperienceFluid.INSTANCE, "experience");
+        setupFluidTextures(MoltenGoldFluid.Still.INSTANCE, "molten_gold");
+        setupFluidTextures(MoltenGoldFluid.Flowing.INSTANCE, "molten_gold");
 
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), //
                 Magifacture.INFUSED_GLASS);
@@ -27,10 +30,10 @@ public class MagifactureClient implements ClientModInitializer {
         HandledScreens.register(AlembicScreenHandler.TYPE, AlembicScreen::new);
     }
 
-    private static void setupFluidTextures(Fluid fluid) {
+    private static void setupFluidTextures(Fluid fluid, String name) {
         Identifier id = Registries.FLUID.getId(fluid);
-        Identifier still = new Identifier(id.getNamespace(), "block/" + id.getPath());
-        Identifier flow = new Identifier(id.getNamespace(), "block/" + id.getPath() + "_flow");
+        Identifier still = new Identifier(id.getNamespace(), "block/" + name);
+        Identifier flow = new Identifier(id.getNamespace(), "block/" + name + "_flow");
         FluidRenderHandlerRegistry.INSTANCE.register(fluid, new SimpleFluidRenderHandler(still, flow, 0xFF_FFFFFF));
     }
 }

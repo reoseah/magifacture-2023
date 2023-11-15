@@ -1,0 +1,17 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": {
+    "item": "minecraft:golden_shovel"
+  },
+  "duration": 200,
+  "result": {
+    "item": "magifacture:ash"
+  },
+  "fluid": {
+    "variant": {
+      "fluid": "magifacture:molten_gold"
+    },
+    "amount": 9000
+  },
+  "experience": 0
+}

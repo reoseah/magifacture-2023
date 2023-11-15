@@ -152,6 +152,8 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     }
 
     public static void tickServer(World world, BlockPos pos, BlockState state, CrematoriumBlockEntity be) {
+        FluidUtils.tryFillItem(be.tank, be, EMPTY_SLOT, FILLED_SLOT);
+
         boolean wasBurning = state.get(Properties.LIT);
 
         if (be.fuelLeft > 0) {
@@ -211,8 +213,9 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
 
         this.addStack(OUTPUT_SLOT, recipe.craft(this, this.world.getRegistryManager()));
 
-        FluidUtils.insert(recipe.getFluid(), this.tank);
-
+        if (recipe.getFluid() != null) {
+            FluidUtils.insert(recipe.getFluid(), this.tank);
+        }
         ItemStack input = this.slots.get(INPUT_SLOT);
         input.decrement(recipe.getInputCount());
         this.setStack(INPUT_SLOT, input); // updates cached recipe

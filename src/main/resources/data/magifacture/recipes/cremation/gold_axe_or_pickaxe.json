@@ -1,0 +1,22 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": [
+	{
+	  "item": "minecraft:golden_axe"
+	},
+	{
+	  "item": "minecraft:golden_pickaxe"
+	}
+  ],
+  "duration": 600,
+  "result": {
+	"item": "magifacture:ash"
+  },
+  "fluid": {
+	"variant": {
+	  "fluid": "magifacture:molten_gold"
+	},
+	"amount": 27000
+  },
+  "experience": 0
+}
