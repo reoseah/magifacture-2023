@@ -1,9 +1,6 @@
 package magifacture;
 
-import magifacture.block.AlembicBlock;
-import magifacture.block.CrematoriumBlock;
-import magifacture.block.ExperienceBlock;
-import magifacture.block.TerraEnchanterBlock;
+import magifacture.block.*;
 import magifacture.block.entity.AlembicBlockEntity;
 import magifacture.block.entity.CrematoriumBlockEntity;
 import magifacture.fluid.ExperienceFluid;
@@ -22,20 +19,25 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.EmptyItemFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.FullItemFluidStorage;
 import net.minecraft.block.*;
+import net.minecraft.block.dispenser.DispenserBehavior;
+import net.minecraft.block.dispenser.ItemDispenserBehavior;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.math.BlockPointer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Magifacture implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("magifacture");
 
-    public static final Block MOLTEN_GOLD = new FluidBlock(MoltenGoldFluid.Still.INSTANCE, AbstractBlock.Settings.create().mapColor(MapColor.BRIGHT_RED).strength(100F).dropsNothing());
+    public static final Block MOLTEN_GOLD = new MoltenMetalBlock(MoltenGoldFluid.Still.INSTANCE, Blocks.GOLD_BLOCK, AbstractBlock.Settings.create().liquid().mapColor(MapColor.BRIGHT_RED).strength(100F).dropsNothing());
 
     public static final Block INFUSED_STONE = new Block(AbstractBlock.Settings.create().mapColor(MapColor.PURPLE).strength(2F));
     public static final Block MAGIC_CRYSTAL_ORE = new Block(AbstractBlock.Settings.create().mapColor(MapColor.MAGENTA).strength(3F).luminance(state -> 10));
@@ -83,7 +85,23 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.ITEM, "magifacture:ash", ASH);
 
         CompostingChanceRegistry.INSTANCE.add(ASH, 0.05F);
-        
+
+        DispenserBehavior bucketBehavior = new ItemDispenserBehavior() {
+            private final ItemDispenserBehavior fallbackBehavior = new ItemDispenserBehavior();
+
+            public ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
+                FluidModificationItem item = (FluidModificationItem) stack.getItem();
+                BlockPos blockPos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING));
+                World world = pointer.world();
+                if (item.placeFluid(null, world, blockPos, null)) {
+                    item.onEmptied(null, world, stack, blockPos);
+                    return new ItemStack(Items.BUCKET);
+                }
+                return this.fallbackBehavior.dispense(pointer, stack);
+            }
+        };
+        DispenserBlock.registerBehavior(MOLTEN_GOLD_BUCKET, bucketBehavior);
+
         // noinspection UnstableApiUsage
         FluidStorage.combinedItemApiProvider(Items.GLASS_BOTTLE).register(context -> new EmptyItemFluidStorage(context, Items.EXPERIENCE_BOTTLE, ExperienceFluid.INSTANCE, FluidConstants.BOTTLE));
         // noinspection UnstableApiUsage

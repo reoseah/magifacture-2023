@@ -1,0 +1,4 @@
+accessWidener v1 named
+
+extendable    method    net/minecraft/block/FluidBlock    receiveNeighborFluids    (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z
+accessible    method    net/minecraft/block/FluidBlock    playExtinguishSound    (Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;)V

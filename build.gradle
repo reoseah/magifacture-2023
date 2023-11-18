@@ -33,16 +33,9 @@ repositories {
     }
 }
 
-// loom {
-//     splitEnvironmentSourceSets()
-
-// 	mods {
-// 		"magifacture" {
-// 			sourceSet sourceSets.main
-// 			sourceSet sourceSets.client
-// 		}
-// 	}
-// }
+loom {
+    accessWidenerPath = file('src/main/resources/magifacture.accesswidener')
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
