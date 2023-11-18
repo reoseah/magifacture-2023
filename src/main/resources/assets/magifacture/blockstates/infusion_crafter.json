@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "magifacture:block/infusion_crafter",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "magifacture:block/infusion_crafter"
+    },
+    "facing=south": {
+      "model": "magifacture:block/infusion_crafter",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "magifacture:block/infusion_crafter",
+      "y": 270
+    }
+  }
+}

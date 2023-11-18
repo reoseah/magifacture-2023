@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TerraEnchanterBlock extends MagifactureBlock {
     public static final Block INSTANCE = new TerraEnchanterBlock(FabricBlockSettings.create().mapColor(MapColor.GRAY).strength(3F));
-    public static final Item ITEM = new BlockItem(INSTANCE, new FabricItemSettings().rarity(Rarity.RARE));
+    public static final Item ITEM = new BlockItem(INSTANCE, new FabricItemSettings().rarity(Rarity.UNCOMMON));
 
     protected TerraEnchanterBlock(Settings settings) {
         super(settings);

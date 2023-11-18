@@ -56,6 +56,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.BLOCK, "magifacture:molten_gold", MOLTEN_GOLD);
         Registry.register(Registries.BLOCK, "magifacture:crematorium", CrematoriumBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:alembic", AlembicBlock.INSTANCE);
+        Registry.register(Registries.BLOCK, "magifacture:infusion_crafter", InfusionCrafterBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:terra_enchanter", TerraEnchanterBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:infused_stone", INFUSED_STONE);
         Registry.register(Registries.BLOCK, "magifacture:magic_crystal_ore", MAGIC_CRYSTAL_ORE);
@@ -73,6 +74,7 @@ public class Magifacture implements ModInitializer {
 
         Registry.register(Registries.ITEM, "magifacture:crematorium", CrematoriumBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:alembic", AlembicBlock.ITEM);
+        Registry.register(Registries.ITEM, "magifacture:infusion_crafter", InfusionCrafterBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:terra_enchanter", TerraEnchanterBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:infused_stone", new BlockItem(INFUSED_STONE, new Item.Settings()));
         Registry.register(Registries.ITEM, "magifacture:magic_crystal_ore", new BlockItem(MAGIC_CRYSTAL_ORE, new Item.Settings().rarity(Rarity.UNCOMMON)));
@@ -113,6 +115,7 @@ public class Magifacture implements ModInitializer {
                 .entries((parameters, entries) -> { //
                     entries.add(CrematoriumBlock.INSTANCE);
                     entries.add(AlembicBlock.INSTANCE);
+                    entries.add(InfusionCrafterBlock.INSTANCE);
                     entries.add(TerraEnchanterBlock.INSTANCE);
                     entries.add(INFUSED_STONE);
                     entries.add(MAGIC_CRYSTAL_ORE);
