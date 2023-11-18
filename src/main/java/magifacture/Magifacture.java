@@ -43,7 +43,7 @@ public class Magifacture implements ModInitializer {
     public static final Block HIGHLY_INFUSED_GLASS = new Block(AbstractBlock.Settings.create().mapColor(MapColor.PINK).strength(2F).luminance(state -> 14).nonOpaque().sounds(BlockSoundGroup.GLASS));
     public static final Block MAGIC_CRYSTAL_BLOCK = new Block(AbstractBlock.Settings.create().mapColor(MapColor.YELLOW).strength(3F, 5F).luminance(state -> 15).sounds(BlockSoundGroup.AMETHYST_BLOCK));
 
-    public static final Item MOLTEN_GOLD_BUCKET = new BucketItem(MoltenGoldFluid.Still.INSTANCE, new Item.Settings());
+    public static final Item MOLTEN_GOLD_BUCKET = new BucketItem(MoltenGoldFluid.Still.INSTANCE, new Item.Settings().recipeRemainder(Items.BUCKET));
     public static final Item ASH = new Item(new Item.Settings());
 
     @Override

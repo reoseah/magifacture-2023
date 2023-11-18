@@ -1,5 +1,9 @@
 package magifacture.screen;
 
+import magifacture.block.entity.CrematoriumBlockEntity;
+import magifacture.recipe.CremationRecipe;
+import magifacture.screen.slot.MagifactureFuelSlot;
+import magifacture.screen.slot.MagifactureOutputSlot;
 import magifacture.util.FluidUtils;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
@@ -13,17 +17,17 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.world.World;
-import magifacture.block.entity.CrematoriumBlockEntity;
-import magifacture.screen.slot.MagifactureFuelSlot;
-import magifacture.screen.slot.MagifactureOutputSlot;
 
 public class CrematoriumScreenHandler extends MagifactureScreenHandler {
     public static final ScreenHandlerType<CrematoriumScreenHandler> TYPE = new ScreenHandlerType<>(CrematoriumScreenHandler::new, FeatureFlags.VANILLA_FEATURES);
     public final PropertyDelegate properties;
     public final SingleFluidStorage tank;
+    private final World world;
 
     private CrematoriumScreenHandler(int syncId, Inventory inventory, SingleFluidStorage tank, PlayerInventory playerInv, PropertyDelegate properties) {
         super(TYPE, syncId, inventory);
+
+        this.world = playerInv.player.getWorld();
 
         this.addSlot(new Slot(this.inventory, 0, 18, 17));
         this.addSlot(new MagifactureFuelSlot(this.inventory, 1, 18, 53));
@@ -70,12 +74,20 @@ public class CrematoriumScreenHandler extends MagifactureScreenHandler {
     @Override
     protected int getPreferredQuickMoveSlot(ItemStack stack, World world, int slot) {
         if (slot >= this.inventory.size()) {
-            if (FluidUtils.canFillItem(stack, this.tank.variant.getFluid())) {
+            if (this.isProcessable(stack)) {
+                return CrematoriumBlockEntity.INPUT_SLOT;
+            } else if (FluidUtils.canFillItem(stack, this.tank.variant.getFluid())) {
                 return CrematoriumBlockEntity.EMPTY_SLOT;
             } else if (AbstractFurnaceBlockEntity.canUseAsFuel(stack)) {
                 return CrematoriumBlockEntity.FUEL_SLOT;
             }
         }
         return super.getPreferredQuickMoveSlot(stack, world, slot);
+    }
+
+    protected boolean isProcessable(ItemStack stack) {
+        return this.world.getRecipeManager() //
+                .getFirstMatch(CremationRecipe.TYPE, new SimpleInventory(stack), this.world) //
+                .isPresent();
     }
 }
