@@ -3,10 +3,13 @@ package magifacture;
 import magifacture.block.*;
 import magifacture.block.entity.AlembicBlockEntity;
 import magifacture.block.entity.CrematoriumBlockEntity;
+import magifacture.block.entity.InfuserBlockEntity;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.fluid.MoltenGoldFluid;
 import magifacture.item.ExperienceBucketItem;
 import magifacture.recipe.CremationRecipe;
+import magifacture.recipe.InfusionRecipe;
+import magifacture.recipe.ItemFillingInfusionRecipe;
 import magifacture.recipe.SimpleCremationRecipe;
 import magifacture.screen.AlembicScreenHandler;
 import magifacture.screen.CrematoriumScreenHandler;
@@ -56,7 +59,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.BLOCK, "magifacture:molten_gold", MOLTEN_GOLD);
         Registry.register(Registries.BLOCK, "magifacture:crematorium", CrematoriumBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:alembic", AlembicBlock.INSTANCE);
-        Registry.register(Registries.BLOCK, "magifacture:infusion_crafter", InfusionCrafterBlock.INSTANCE);
+        Registry.register(Registries.BLOCK, "magifacture:infuser", InfuserBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:terra_enchanter", TerraEnchanterBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:infused_stone", INFUSED_STONE);
         Registry.register(Registries.BLOCK, "magifacture:magic_crystal_ore", MAGIC_CRYSTAL_ORE);
@@ -66,7 +69,11 @@ public class Magifacture implements ModInitializer {
 
         Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:alembic", AlembicBlockEntity.TYPE);
         Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:crematorium", CrematoriumBlockEntity.TYPE);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:infuser", InfuserBlockEntity.TYPE);
+
         FluidStorage.SIDED.registerForBlockEntity((be, side) -> side != Direction.UP ? be.getTank() : null, AlembicBlockEntity.TYPE);
+        FluidStorage.SIDED.registerForBlockEntity((be, side) -> side != Direction.UP ? be.getTank() : null, CrematoriumBlockEntity.TYPE);
+        FluidStorage.SIDED.registerForBlockEntity((be, side) -> be.getTank(), InfuserBlockEntity.TYPE);
 
         Registry.register(Registries.FLUID, "magifacture:experience", ExperienceFluid.INSTANCE);
         Registry.register(Registries.FLUID, "magifacture:molten_gold", MoltenGoldFluid.Still.INSTANCE);
@@ -74,7 +81,7 @@ public class Magifacture implements ModInitializer {
 
         Registry.register(Registries.ITEM, "magifacture:crematorium", CrematoriumBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:alembic", AlembicBlock.ITEM);
-        Registry.register(Registries.ITEM, "magifacture:infusion_crafter", InfusionCrafterBlock.ITEM);
+        Registry.register(Registries.ITEM, "magifacture:infuser", InfuserBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:terra_enchanter", TerraEnchanterBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:infused_stone", new BlockItem(INFUSED_STONE, new Item.Settings()));
         Registry.register(Registries.ITEM, "magifacture:magic_crystal_ore", new BlockItem(MAGIC_CRYSTAL_ORE, new Item.Settings().rarity(Rarity.UNCOMMON)));
@@ -115,7 +122,7 @@ public class Magifacture implements ModInitializer {
                 .entries((parameters, entries) -> { //
                     entries.add(CrematoriumBlock.INSTANCE);
                     entries.add(AlembicBlock.INSTANCE);
-                    entries.add(InfusionCrafterBlock.INSTANCE);
+                    entries.add(InfuserBlock.INSTANCE);
                     entries.add(TerraEnchanterBlock.INSTANCE);
                     entries.add(INFUSED_STONE);
                     entries.add(MAGIC_CRYSTAL_ORE);
@@ -131,8 +138,10 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.ITEM_GROUP, "magifacture:main", itemGroup);
 
         Registry.register(Registries.RECIPE_TYPE, "magifacture:cremation", CremationRecipe.TYPE);
+        Registry.register(Registries.RECIPE_TYPE, "magifacture:infusion", InfusionRecipe.TYPE);
 
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:cremation", SimpleCremationRecipe.SERIALIZER);
+        Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:item_filling_infusion", ItemFillingInfusionRecipe.SERIALIZER);
 
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:crematorium", CrematoriumScreenHandler.TYPE);
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:alembic", AlembicScreenHandler.TYPE);

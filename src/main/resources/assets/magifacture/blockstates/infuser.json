@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "magifacture:block/infuser",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "magifacture:block/infuser"
+    },
+    "facing=south": {
+      "model": "magifacture:block/infuser",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "magifacture:block/infuser",
+      "y": 270
+    }
+  }
+}

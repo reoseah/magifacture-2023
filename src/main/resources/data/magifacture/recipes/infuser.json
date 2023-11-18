@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+	"###",
+	"#C#",
+	"IBI"
+  ],
+  "key": {
+	"#": {
+	  "item": "minecraft:cobblestone"
+	},
+	"I": {
+	  "item": "minecraft:iron_ingot"
+	},
+	"B": {
+	  "item": "minecraft:bucket"
+	},
+	"C": {
+	  "item": "minecraft:crafting_table"
+	}
+  },
+  "result": {
+	"item": "magifacture:infuser"
+  }
+}

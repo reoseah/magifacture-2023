@@ -2,10 +2,7 @@ package magifacture;
 
 import magifacture.fluid.ExperienceFluid;
 import magifacture.fluid.MoltenGoldFluid;
-import magifacture.screen.AlembicScreen;
-import magifacture.screen.AlembicScreenHandler;
-import magifacture.screen.CrematoriumScreen;
-import magifacture.screen.CrematoriumScreenHandler;
+import magifacture.screen.*;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
@@ -28,6 +25,7 @@ public class MagifactureClient implements ClientModInitializer {
 
         HandledScreens.register(CrematoriumScreenHandler.TYPE, CrematoriumScreen::new);
         HandledScreens.register(AlembicScreenHandler.TYPE, AlembicScreen::new);
+        HandledScreens.register(InfuserScreenHandler.TYPE, InfuserScreen::new);
     }
 
     private static void setupFluidTextures(Fluid fluid, String name) {
