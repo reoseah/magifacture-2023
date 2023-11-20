@@ -50,6 +50,7 @@ public class Magifacture implements ModInitializer {
 
     public static final Item MOLTEN_GOLD_BUCKET = new BucketItem(MoltenGoldFluid.Still.INSTANCE, new Item.Settings().recipeRemainder(Items.BUCKET));
     public static final Item ASH = new Item(new Item.Settings());
+    public static final Item MAGIC_CRYSTAL = new Item(new Item.Settings().rarity(Rarity.RARE));
 
     @Override
     public void onInitialize() {
@@ -92,6 +93,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.ITEM, "magifacture:experience_bucket", ExperienceBucketItem.INSTANCE);
         Registry.register(Registries.ITEM, "magifacture:molten_gold_bucket", MOLTEN_GOLD_BUCKET);
         Registry.register(Registries.ITEM, "magifacture:ash", ASH);
+        Registry.register(Registries.ITEM, "magifacture:magic_crystal", MAGIC_CRYSTAL);
 
         CompostingChanceRegistry.INSTANCE.add(ASH, 0.05F);
 
@@ -133,6 +135,7 @@ public class Magifacture implements ModInitializer {
                     entries.add(ExperienceBucketItem.INSTANCE);
                     entries.add(MOLTEN_GOLD_BUCKET);
                     entries.add(ASH);
+                    entries.add(MAGIC_CRYSTAL);
                 }) //
                 .build();
         Registry.register(Registries.ITEM_GROUP, "magifacture:main", itemGroup);

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "magifacture:magic_crystal"
+    }
+  },
+  "result": {
+    "item": "magifacture:magic_crystal_block"
+  }
+}

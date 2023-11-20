@@ -14,6 +14,7 @@
   "item.magifacture.experience_bucket": "Bucket of Magic Essence",
   "item.magifacture.molten_gold_bucket": "Bucket of Molten Gold",
   "item.magifacture.ash": "Ash",
+  "item.magifacture.magic_crystal": "Magic Crystal",
   "fluid.minecraft.empty": "Empty",
   "magifacture.amount_and_capacity": "%s / %s",
   "magifacture.millibucket.amount": "%s mB",
