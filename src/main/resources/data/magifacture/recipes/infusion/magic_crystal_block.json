@@ -1,0 +1,23 @@
+{
+  "type": "magifacture:shaped_infusion",
+  "pattern": [
+	"###",
+	"###",
+	"###"
+  ],
+  "key": {
+	"#": {
+	  "item": "magifacture:magic_crystal"
+	}
+  },
+  "fluid": {
+	"variant": {
+	  "fluid": "magifacture:experience"
+	},
+	"amount": 27000
+  },
+  "result": {
+	"item": "magifacture:magic_crystal_block"
+  },
+  "duration": 200
+}

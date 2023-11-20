@@ -2,3 +2,6 @@ accessWidener v1 named
 
 extendable    method    net/minecraft/block/FluidBlock    receiveNeighborFluids    (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z
 accessible    method    net/minecraft/block/FluidBlock    playExtinguishSound    (Lnet/minecraft/world/WorldAccess;Lnet/minecraft/util/math/BlockPos;)V
+accessible    field    net/minecraft/recipe/ShapedRecipe$Serializer    PATTERN_CODEC    Lcom/mojang/serialization/Codec;
+accessible    field    net/minecraft/recipe/ShapedRecipe$Serializer    KEY_ENTRY_CODEC    Lcom/mojang/serialization/Codec;
+accessible    method    net/minecraft/recipe/ShapedRecipe    removePadding    (Ljava/util/List;)[Ljava/lang/String;

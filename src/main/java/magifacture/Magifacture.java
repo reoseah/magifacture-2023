@@ -7,10 +7,7 @@ import magifacture.block.entity.InfuserBlockEntity;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.fluid.MoltenGoldFluid;
 import magifacture.item.ExperienceBucketItem;
-import magifacture.recipe.CremationRecipe;
-import magifacture.recipe.InfusionRecipe;
-import magifacture.recipe.ItemFillingInfusionRecipe;
-import magifacture.recipe.SimpleCremationRecipe;
+import magifacture.recipe.*;
 import magifacture.screen.AlembicScreenHandler;
 import magifacture.screen.CrematoriumScreenHandler;
 import net.fabricmc.api.ModInitializer;
@@ -145,6 +142,7 @@ public class Magifacture implements ModInitializer {
 
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:cremation", SimpleCremationRecipe.SERIALIZER);
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:item_filling_infusion", ItemFillingInfusionRecipe.SERIALIZER);
+        Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:shaped_infusion", ShapedInfusionRecipe.SERIALIZER);
 
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:crematorium", CrematoriumScreenHandler.TYPE);
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:alembic", AlembicScreenHandler.TYPE);
