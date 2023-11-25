@@ -26,6 +26,7 @@ public class MagifactureClient implements ClientModInitializer {
         HandledScreens.register(CrematoriumScreenHandler.TYPE, CrematoriumScreen::new);
         HandledScreens.register(AlembicScreenHandler.TYPE, AlembicScreen::new);
         HandledScreens.register(InfuserScreenHandler.TYPE, InfuserScreen::new);
+        HandledScreens.register(MixingColumnScreenHandler.TYPE, MixingColumnScreen::new);
     }
 
     private static void setupFluidTextures(Fluid fluid, String name) {

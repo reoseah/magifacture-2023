@@ -5,9 +5,9 @@ import magifacture.block.ExperienceBlock;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.screen.AlembicScreenHandler;
 import magifacture.util.FluidUtils;
+import magifacture.util.SerializableSingleFluidStorage;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerInventory;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 public class AlembicBlockEntity extends MagifactureBlockEntity implements SidedInventory {
     public static final BlockEntityType<AlembicBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(AlembicBlockEntity::new, AlembicBlock.INSTANCE).build();
 
-    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(4000 * 81, this::markDirty);
+    protected final SerializableSingleFluidStorage tank = new SerializableSingleFluidStorage(4000 * 81);
 
     public AlembicBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
@@ -90,7 +90,7 @@ public class AlembicBlockEntity extends MagifactureBlockEntity implements SidedI
         FluidUtils.tryFillItem(be.tank, be, EMPTY_SLOT, FILLED_SLOT);
     }
 
-    public SingleFluidStorage getTank() {
+    public SerializableSingleFluidStorage getTank() {
         return this.tank;
     }
 }

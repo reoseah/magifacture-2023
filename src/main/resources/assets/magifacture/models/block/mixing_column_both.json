@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "magifacture:block/mixing_column_inside",
+    "side": "magifacture:block/mixing_column_side_both",
+    "bottom": "magifacture:block/mixing_column_inside"
+  }
+}

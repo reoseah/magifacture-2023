@@ -4,12 +4,14 @@ import magifacture.block.*;
 import magifacture.block.entity.AlembicBlockEntity;
 import magifacture.block.entity.CrematoriumBlockEntity;
 import magifacture.block.entity.InfuserBlockEntity;
+import magifacture.block.entity.MixingColumnBlockEntity;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.fluid.MoltenGoldFluid;
 import magifacture.item.ExperienceBucketItem;
 import magifacture.recipe.*;
 import magifacture.screen.AlembicScreenHandler;
 import magifacture.screen.CrematoriumScreenHandler;
+import magifacture.screen.MixingColumnScreenHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
@@ -45,7 +47,7 @@ public class Magifacture implements ModInitializer {
     public static final Block HIGHLY_INFUSED_GLASS = new Block(AbstractBlock.Settings.create().mapColor(MapColor.PINK).strength(2F).luminance(state -> 14).nonOpaque().sounds(BlockSoundGroup.GLASS));
     public static final Block MAGIC_CRYSTAL_BLOCK = new Block(AbstractBlock.Settings.create().mapColor(MapColor.YELLOW).strength(3F, 5F).luminance(state -> 15).sounds(BlockSoundGroup.AMETHYST_BLOCK));
 
-    public static final Item MOLTEN_GOLD_BUCKET = new BucketItem(MoltenGoldFluid.Still.INSTANCE, new Item.Settings().recipeRemainder(Items.BUCKET));
+    public static final Item MOLTEN_GOLD_BUCKET = new BucketItem(MoltenGoldFluid.Still.INSTANCE, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1));
     public static final Item ASH = new Item(new Item.Settings());
     public static final Item MAGIC_CRYSTAL = new Item(new Item.Settings().rarity(Rarity.RARE));
 
@@ -58,6 +60,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.BLOCK, "magifacture:crematorium", CrematoriumBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:alembic", AlembicBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:infuser", InfuserBlock.INSTANCE);
+        Registry.register(Registries.BLOCK, "magifacture:mixing_column", MixingColumnBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:terra_enchanter", TerraEnchanterBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:infused_stone", INFUSED_STONE);
         Registry.register(Registries.BLOCK, "magifacture:magic_crystal_ore", MAGIC_CRYSTAL_ORE);
@@ -68,10 +71,12 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:alembic", AlembicBlockEntity.TYPE);
         Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:crematorium", CrematoriumBlockEntity.TYPE);
         Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:infuser", InfuserBlockEntity.TYPE);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:mixing_column", MixingColumnBlockEntity.TYPE);
 
         FluidStorage.SIDED.registerForBlockEntity((be, side) -> side != Direction.UP ? be.getTank() : null, AlembicBlockEntity.TYPE);
         FluidStorage.SIDED.registerForBlockEntity((be, side) -> side != Direction.UP ? be.getTank() : null, CrematoriumBlockEntity.TYPE);
         FluidStorage.SIDED.registerForBlockEntity((be, side) -> be.getTank(), InfuserBlockEntity.TYPE);
+        FluidStorage.SIDED.registerForBlockEntity((be, side) -> be.getFluidStorage(), MixingColumnBlockEntity.TYPE);
 
         Registry.register(Registries.FLUID, "magifacture:experience", ExperienceFluid.INSTANCE);
         Registry.register(Registries.FLUID, "magifacture:molten_gold", MoltenGoldFluid.Still.INSTANCE);
@@ -80,6 +85,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.ITEM, "magifacture:crematorium", CrematoriumBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:alembic", AlembicBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:infuser", InfuserBlock.ITEM);
+        Registry.register(Registries.ITEM, "magifacture:mixing_column", MixingColumnBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:terra_enchanter", TerraEnchanterBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:infused_stone", new BlockItem(INFUSED_STONE, new Item.Settings()));
         Registry.register(Registries.ITEM, "magifacture:magic_crystal_ore", new BlockItem(MAGIC_CRYSTAL_ORE, new Item.Settings().rarity(Rarity.UNCOMMON)));
@@ -122,6 +128,7 @@ public class Magifacture implements ModInitializer {
                     entries.add(CrematoriumBlock.INSTANCE);
                     entries.add(AlembicBlock.INSTANCE);
                     entries.add(InfuserBlock.INSTANCE);
+                    entries.add(MixingColumnBlock.INSTANCE);
                     entries.add(TerraEnchanterBlock.INSTANCE);
                     entries.add(INFUSED_STONE);
                     entries.add(MAGIC_CRYSTAL_ORE);
@@ -146,5 +153,6 @@ public class Magifacture implements ModInitializer {
 
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:crematorium", CrematoriumScreenHandler.TYPE);
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:alembic", AlembicScreenHandler.TYPE);
+        Registry.register(Registries.SCREEN_HANDLER, "magifacture:mixing_column", MixingColumnScreenHandler.TYPE);
     }
 }

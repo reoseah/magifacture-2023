@@ -1,8 +1,8 @@
 package magifacture.screen;
 
 import magifacture.block.entity.InfuserBlockEntity;
-import magifacture.screen.slot.MagifactureOutputSlot;
-import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
+import magifacture.util.SerializableSingleFluidStorage;
+import magifacture.screen.slot.SimpleOutputSlot;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -15,9 +15,9 @@ import net.minecraft.screen.slot.Slot;
 public class InfuserScreenHandler extends MagifactureScreenHandler {
     public static final ScreenHandlerType<InfuserScreenHandler> TYPE = new ScreenHandlerType<>(InfuserScreenHandler::new, FeatureFlags.VANILLA_FEATURES);
     public final PropertyDelegate properties;
-    public final SingleFluidStorage tank;
+    public final SerializableSingleFluidStorage tank;
 
-    private InfuserScreenHandler(int syncId, Inventory inventory, SingleFluidStorage tank, PlayerInventory playerInv, PropertyDelegate properties) {
+    private InfuserScreenHandler(int syncId, Inventory inventory, SerializableSingleFluidStorage tank, PlayerInventory playerInv, PropertyDelegate properties) {
         super(TYPE, syncId, inventory);
 
         for (int x = 0; x < 3; x++) {
@@ -26,14 +26,14 @@ public class InfuserScreenHandler extends MagifactureScreenHandler {
             }
         }
 
-        this.addSlot(new MagifactureOutputSlot(inventory, InfuserBlockEntity.SLOT_OUTPUT, 148, 35));
+        this.addSlot(new SimpleOutputSlot(inventory, InfuserBlockEntity.SLOT_OUTPUT, 148, 35));
 
         this.addSlot(new Slot(this.inventory, InfuserBlockEntity.SLOT_FULL, 8, 17));
-        this.addSlot(new MagifactureOutputSlot(this.inventory, InfuserBlockEntity.SLOT_DRAINED, 8, 53));
+        this.addSlot(new SimpleOutputSlot(this.inventory, InfuserBlockEntity.SLOT_DRAINED, 8, 53));
 
         this.addPlayerSlots(playerInv);
 
-        this.addTank(this.tank = tank);
+        this.addNbtSerializable(this.tank = tank);
         this.addProperties(this.properties = properties);
     }
 
@@ -61,7 +61,6 @@ public class InfuserScreenHandler extends MagifactureScreenHandler {
     }
 
     public InfuserScreenHandler(int syncId, PlayerInventory playerInv) {
-        this(syncId, new SimpleInventory(InfuserBlockEntity.INVENTORY_SIZE), SingleFluidStorage.withFixedCapacity(InfuserBlockEntity.CAPACITY_MB * 81, () -> {
-        }), playerInv, new ArrayPropertyDelegate(2));
+        this(syncId, new SimpleInventory(InfuserBlockEntity.INVENTORY_SIZE), new SerializableSingleFluidStorage(InfuserBlockEntity.CAPACITY_MB * 81), playerInv, new ArrayPropertyDelegate(2));
     }
 }

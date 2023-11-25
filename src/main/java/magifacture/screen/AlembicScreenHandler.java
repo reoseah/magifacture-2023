@@ -2,9 +2,9 @@ package magifacture.screen;
 
 import lombok.Getter;
 import magifacture.block.entity.AlembicBlockEntity;
+import magifacture.util.SerializableSingleFluidStorage;
 import magifacture.util.FluidUtils;
-import magifacture.screen.slot.MagifactureOutputSlot;
-import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
+import magifacture.screen.slot.SimpleOutputSlot;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -17,15 +17,15 @@ import net.minecraft.world.World;
 public class AlembicScreenHandler extends MagifactureScreenHandler {
     public static final ScreenHandlerType<AlembicScreenHandler> TYPE = new ScreenHandlerType<>(AlembicScreenHandler::new, FeatureFlags.VANILLA_FEATURES);
     @Getter
-    protected final SingleFluidStorage tank;
+    protected final SerializableSingleFluidStorage tank;
 
-    private AlembicScreenHandler(int syncId, Inventory inventory, SingleFluidStorage tank, PlayerInventory playerInv) {
+    private AlembicScreenHandler(int syncId, Inventory inventory, SerializableSingleFluidStorage tank, PlayerInventory playerInv) {
         super(TYPE, syncId, inventory);
         this.addSlot(new Slot(this.inventory, 0, 98, 18));
-        this.addSlot(new MagifactureOutputSlot(this.inventory, 1, 98, 54));
+        this.addSlot(new SimpleOutputSlot(this.inventory, 1, 98, 54));
         this.addPlayerSlots(playerInv);
 
-        this.addTank(this.tank = tank);
+        this.addNbtSerializable(this.tank = tank);
     }
 
     public AlembicScreenHandler(int syncId, AlembicBlockEntity be, PlayerInventory playerInv) {
@@ -33,7 +33,7 @@ public class AlembicScreenHandler extends MagifactureScreenHandler {
     }
 
     public AlembicScreenHandler(int syncId, PlayerInventory playerInv) {
-        this(syncId, new SimpleInventory(2), SingleFluidStorage.withFixedCapacity(4000 * 81, () -> {
+        this(syncId, new SimpleInventory(2), SerializableSingleFluidStorage.withFixedCapacity(4000 * 81, () -> {
         }), playerInv);
     }
 

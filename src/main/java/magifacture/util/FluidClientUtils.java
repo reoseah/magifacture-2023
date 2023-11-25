@@ -53,7 +53,7 @@ public class FluidClientUtils {
         return Text.translatable(Util.createTranslationKey("block", id));
     }
 
-    public static MutableText getAmountText(int amount) {
+    public static MutableText getAmountText(long amount) {
         // welp yep it did happen to me so this is now here
         if (amount < 0) {
             return Text.literal("-").append(getAmountText(-amount));
@@ -79,11 +79,11 @@ public class FluidClientUtils {
 
     public static final String AMOUNT_AND_CAPACITY = "magifacture.amount_and_capacity";
 
-    public static MutableText getAmountTextWithCapacity(int amount, int maxAmount) {
+    public static MutableText getAmountTextWithCapacity(long amount, long maxAmount) {
         return Text.translatable(AMOUNT_AND_CAPACITY, getAmountText(amount), getAmountText(maxAmount)).formatted(Formatting.GRAY);
     }
 
-    public static List<Text> getTooltipWithCapacity(Fluid fluid, int amount, int maxAmount) {
+    public static List<Text> getTooltipWithCapacity(Fluid fluid, long amount, long maxAmount) {
         return Arrays.asList(getName(fluid), getAmountTextWithCapacity(amount, maxAmount));
     }
 

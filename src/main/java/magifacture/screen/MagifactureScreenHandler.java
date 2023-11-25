@@ -1,7 +1,7 @@
 package magifacture.screen;
 
-import magifacture.screen.slot.NbtCarryingSlot;
-import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
+import magifacture.screen.slot.NbtSynchronizingSlot;
+import magifacture.util.NbtSerializable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -96,13 +96,12 @@ public abstract class MagifactureScreenHandler extends ScreenHandler {
         }
     }
 
-    protected void addTank(SingleFluidStorage tank) {
-        // TODO change this to take some NbtSerializable interface
-        this.addSlot(new NbtCarryingSlot(() -> {
+    protected void addNbtSerializable(NbtSerializable serializable) {
+        this.addSlot(new NbtSynchronizingSlot(() -> {
             NbtCompound nbt = new NbtCompound();
-            tank.writeNbt(nbt);
+            serializable.writeNbt(nbt);
             return nbt;
-        }, tank::readNbt));
+        }, serializable::readNbt));
     }
 
     public boolean isInventorySlot(Slot slot) {

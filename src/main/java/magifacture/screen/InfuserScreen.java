@@ -17,15 +17,14 @@ public class InfuserScreen extends MagifactureScreen<InfuserScreenHandler> {
     }
 
     @Override
-    protected Identifier getTextureId() {
+    public Identifier getTextureId() {
         return TEXTURE;
     }
 
     @Override
-    protected int getTankOverlayU() {
+    public int getTankOverlayU() {
         return 208;
     }
-
 
     @Override
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {

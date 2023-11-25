@@ -7,10 +7,10 @@ import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.InfusionRecipe;
 import magifacture.screen.InfuserScreenHandler;
 import magifacture.util.FluidUtils;
+import magifacture.util.SerializableSingleFluidStorage;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerInventory;
@@ -38,19 +38,22 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
 
     public static final BlockEntityType<InfuserBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(InfuserBlockEntity::new, InfuserBlock.INSTANCE).build();
 
-    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(CAPACITY_MB * 81, () -> {
-        this.markDirty();
-        if (this.cachedRecipe != null) {
-            if (this.cachedRecipe.isEmpty()) {
-                this.resetCachedRecipe();
-            } else {
-                InfusionRecipe recipe = this.cachedRecipe.get();
-                if (!recipe.matches(this, this.world)) {
-                    this.resetCachedRecipe();
+    protected final SerializableSingleFluidStorage tank = new SerializableSingleFluidStorage(CAPACITY_MB) {
+        @Override
+        protected void onFinalCommit() {
+            InfuserBlockEntity.this.markDirty();
+            if (InfuserBlockEntity.this.cachedRecipe != null) {
+                if (InfuserBlockEntity.this.cachedRecipe.isEmpty()) {
+                    InfuserBlockEntity.this.resetCachedRecipe();
+                } else {
+                    InfusionRecipe recipe = InfuserBlockEntity.this.cachedRecipe.get();
+                    if (!recipe.matches(InfuserBlockEntity.this, InfuserBlockEntity.this.world)) {
+                        InfuserBlockEntity.this.resetCachedRecipe();
+                    }
                 }
             }
         }
-    });
+    };
 
     public InfuserBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
@@ -118,8 +121,8 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
         this.tank.writeNbt(tag);
     }
 
-    public SingleFluidStorage getTank() {
-        return tank;
+    public SerializableSingleFluidStorage getTank() {
+        return this.tank;
     }
 
     @Override

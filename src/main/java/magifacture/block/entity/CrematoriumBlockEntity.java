@@ -1,5 +1,6 @@
 package magifacture.block.entity;
 
+import lombok.Getter;
 import magifacture.block.AlembicBlock;
 import magifacture.block.CrematoriumBlock;
 import magifacture.block.ExperienceBlock;
@@ -7,10 +8,10 @@ import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.CremationRecipe;
 import magifacture.screen.CrematoriumScreenHandler;
 import magifacture.util.FluidUtils;
+import magifacture.util.SerializableSingleFluidStorage;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
@@ -37,8 +38,10 @@ import java.util.Optional;
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull", "UnstableApiUsage"})
 public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedInventory {
     public static final BlockEntityType<CrematoriumBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(CrematoriumBlockEntity::new, CrematoriumBlock.INSTANCE).build();
-    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(4000 * 81, this::markDirty);
+    @Getter
+    protected final SerializableSingleFluidStorage tank = new SerializableSingleFluidStorage(4000 * 81);
 
+    @Getter
     protected int recipeProgress;
     protected @Nullable Optional<? extends CremationRecipe> cachedRecipe;
 
@@ -231,14 +234,6 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
             world.spawnEntity(new ExperienceOrbEntity(world, pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F, orbSize));
             xp -= orbSize;
         }
-    }
-
-    public SingleFluidStorage getTank() {
-        return this.tank;
-    }
-
-    public int getRecipeProgress() {
-        return this.recipeProgress;
     }
 
     public int getRecipeDuration() {

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "down=false,up=false": {
+      "model": "magifacture:block/mixing_column"
+    },
+    "down=false,up=true": {
+      "model": "magifacture:block/mixing_column_up"
+    },
+    "down=true,up=false": {
+      "model": "magifacture:block/mixing_column_down"
+    },
+    "down=true,up=true": {
+      "model": "magifacture:block/mixing_column_both"
+    }
+  }
+}

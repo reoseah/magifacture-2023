@@ -7,12 +7,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
-public class AlembicScreen extends MagifactureScreen<AlembicScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier("magifacture", "textures/gui/alembic.png");
+public class MixingColumnScreen extends MagifactureScreen<MixingColumnScreenHandler> {
+    private static final Identifier TEXTURE = new Identifier("magifacture", "textures/gui/mixing_column.png");
 
-    public AlembicScreen(AlembicScreenHandler handler, PlayerInventory inventory, Text title) {
+    public MixingColumnScreen(MixingColumnScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        this.addTankRender(handler.getTank(), 71, 19, 16, 50);
+
+        this.addTankRender(handler.storage, 35, 18, 16, 50);
     }
 
     @Override

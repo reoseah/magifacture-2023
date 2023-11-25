@@ -18,12 +18,12 @@ public class CrematoriumScreen extends MagifactureScreen<CrematoriumScreenHandle
     }
 
     @Override
-    protected Identifier getTextureId() {
+    public Identifier getTextureId() {
         return TEXTURE;
     }
 
     @Override
-    protected int getTankOverlayU() {
+    public int getTankOverlayU() {
         return 208;
     }
 
