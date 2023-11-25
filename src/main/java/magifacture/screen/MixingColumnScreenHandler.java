@@ -2,13 +2,16 @@ package magifacture.screen;
 
 import magifacture.block.entity.MixingColumnBlockEntity;
 import magifacture.screen.slot.SimpleOutputSlot;
+import magifacture.util.FluidTransferUtils;
 import magifacture.util.MultipleFluidStorage;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.World;
 
 public class MixingColumnScreenHandler extends MagifactureScreenHandler {
     public static final ScreenHandlerType<MixingColumnScreenHandler> TYPE = new ScreenHandlerType<>(MixingColumnScreenHandler::new, FeatureFlags.VANILLA_FEATURES);
@@ -28,6 +31,8 @@ public class MixingColumnScreenHandler extends MagifactureScreenHandler {
         this.addSlot(new SimpleOutputSlot(this.inventory, MixingColumnBlockEntity.SLOT_FILLED, 151, 53));
 
         this.addPlayerSlots(playerInv);
+
+        this.addNbtSlot(this.storage::readNbt, this.storage::writeNbt);
     }
 
     public MixingColumnScreenHandler(int syncId, MixingColumnBlockEntity be, PlayerInventory playerInv) {
@@ -35,9 +40,21 @@ public class MixingColumnScreenHandler extends MagifactureScreenHandler {
     }
 
     public MixingColumnScreenHandler(int syncId, PlayerInventory playerInv) {
-        this(syncId,
-                new SimpleInventory(MixingColumnBlockEntity.INVENTORY_SIZE),
-                new MultipleFluidStorage(4000 * 81),
+        this(syncId, //
+                new SimpleInventory(MixingColumnBlockEntity.INVENTORY_SIZE), //
+                new MultipleFluidStorage(4000 * 81), //
                 playerInv);
+    }
+
+    @Override
+    protected int getPreferredQuickMoveSlot(ItemStack stack, World world, int slot) {
+        if (slot >= this.inventory.size()) {
+            if (FluidTransferUtils.canFill(stack)) {
+                return MixingColumnBlockEntity.SLOT_TO_FILL;
+            } else if (FluidTransferUtils.canDrain(stack)) {
+                return MixingColumnBlockEntity.SLOT_TO_DRAIN;
+            }
+        }
+        return super.getPreferredQuickMoveSlot(stack, world, slot);
     }
 }

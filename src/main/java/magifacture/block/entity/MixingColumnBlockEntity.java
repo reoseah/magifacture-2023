@@ -3,18 +3,18 @@ package magifacture.block.entity;
 import lombok.Getter;
 import magifacture.block.MixingColumnBlock;
 import magifacture.screen.MixingColumnScreenHandler;
+import magifacture.util.FluidTransferUtils;
 import magifacture.util.MultipleFluidStorage;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class MixingColumnBlockEntity extends MagifactureBlockEntity {
     public static final int INVENTORY_SIZE = 6;
@@ -38,9 +38,18 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity {
 
     public MixingColumnBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
-        try (Transaction transaction = Transaction.openOuter()) {
-            fluidStorage.insert(FluidVariant.of(Fluids.LAVA), 1000 * 81, transaction);
-        }
+    }
+
+    @Override
+    public void readNbt(NbtCompound tag) {
+        super.readNbt(tag);
+        this.fluidStorage.readNbt(tag);
+    }
+
+    @Override
+    public void writeNbt(NbtCompound tag) {
+        super.writeNbt(tag);
+        this.fluidStorage.writeNbt(tag);
     }
 
     @Override
@@ -51,5 +60,10 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity {
     @Override
     protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
         return new MixingColumnScreenHandler(syncId, this, playerInventory);
+    }
+
+    public static void tickServer(World world, BlockPos pos, BlockState state, MixingColumnBlockEntity be) {
+        FluidTransferUtils.tryDrainItem(be.fluidStorage, be, SLOT_TO_DRAIN, SLOT_DRAINED, Integer.MAX_VALUE);
+        FluidTransferUtils.tryFillItem(be.fluidStorage, be, SLOT_TO_FILL, SLOT_FILLED, Integer.MAX_VALUE);
     }
 }

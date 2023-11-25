@@ -8,21 +8,22 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class NbtSynchronizingSlot extends Slot {
-    public NbtSynchronizingSlot(Supplier<NbtCompound> nbtReader, Consumer<NbtCompound> nbtWriter) {
+    public NbtSynchronizingSlot(Consumer<NbtCompound> nbtReader, Consumer<NbtCompound> nbtWriter) {
         super(new Inventory() {
             @Override
             public ItemStack getStack(int slot) {
-                ItemStack nbtHolder = new ItemStack(Items.CAKE);
-                nbtHolder.setNbt(nbtReader.get());
-                return nbtHolder;
+                ItemStack stack = new ItemStack(Items.CAKE); // it's a lie
+                NbtCompound nbt = new NbtCompound();
+                nbtWriter.accept(nbt);
+                stack.setNbt(nbt);
+                return stack;
             }
 
             @Override
             public void setStack(int slot, ItemStack stack) {
-                nbtWriter.accept(stack.getNbt());
+                nbtReader.accept(stack.getNbt());
             }
 
             @Override

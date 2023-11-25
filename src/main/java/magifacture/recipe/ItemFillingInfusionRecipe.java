@@ -3,7 +3,7 @@ package magifacture.recipe;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.Pair;
 import magifacture.block.entity.InfuserBlockEntity;
-import magifacture.util.FluidUtils;
+import magifacture.util.FluidTransferHacks;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.fluid.Fluid;
@@ -55,7 +55,7 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
             return new ResourceAmount<>(FluidVariant.blank(), 0);
         }
         Fluid fluid = inventory.getTank().variant.getFluid();
-        return new ResourceAmount<>(FluidVariant.of(fluid), FluidUtils.findFilledStack(stack, fluid).value());
+        return new ResourceAmount<>(FluidVariant.of(fluid), FluidTransferHacks.findFilledStack(stack, fluid).value());
     }
 
     @Override
@@ -84,7 +84,7 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
             return false;
         }
         Fluid fluid = inventory.getTank().variant.getFluid();
-        Pair<ItemStack, Long> filledStack = FluidUtils.findFilledStack(stack, fluid);
+        Pair<ItemStack, Long> filledStack = FluidTransferHacks.findFilledStack(stack, fluid);
         return filledStack != null
                 && filledStack.value() <= inventory.getTank().amount;
     }
@@ -105,7 +105,7 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
         if (stack == null) {
             return ItemStack.EMPTY;
         }
-        return FluidUtils.findFilledStack(stack, inventory.getTank().variant.getFluid()).key();
+        return FluidTransferHacks.findFilledStack(stack, inventory.getTank().variant.getFluid()).key();
     }
 
     @Override

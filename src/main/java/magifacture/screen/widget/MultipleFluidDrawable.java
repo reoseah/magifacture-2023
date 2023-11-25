@@ -2,7 +2,8 @@ package magifacture.screen.widget;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import magifacture.screen.MagifactureScreen;
-import magifacture.util.FluidClientUtils;
+import magifacture.util.FluidRendering;
+import magifacture.util.FluidTexts;
 import magifacture.util.MultipleFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.MinecraftClient;
@@ -34,28 +35,26 @@ public class MultipleFluidDrawable implements Drawable {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        long totalAmount = 0;
+        int total = 0;
         for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluids().object2LongEntrySet()) {
             FluidVariant variant = entry.getKey();
             long amount = entry.getLongValue();
 
             if (!variant.isBlank()) {
                 int fluidHeight = MathHelper.clamp(Math.round(amount * (float) this.height / this.storage.getCapacity()), 1, this.height);
-                int offset = MathHelper.clamp(Math.round(totalAmount * (float) this.height / this.storage.getCapacity()), 1, this.height);
 
-                FluidClientUtils.drawFluidColumn(context, variant, //
+                FluidRendering.drawFluidColumn(context, variant, //
                         this.screen.getX() + this.x, //
-                        this.screen.getY() + this.y + this.height - fluidHeight - offset, //
+                        this.screen.getY() + this.y + this.height - fluidHeight - total, //
                         fluidHeight, 1);
                 if (this.width > 16) {
-                    FluidClientUtils.drawFluidColumn(context, variant, //
+                    FluidRendering.drawFluidColumn(context, variant, //
                             this.screen.getX() + this.x + 16, //
-                            this.screen.getY() + this.y + this.height - fluidHeight, //
+                            this.screen.getY() + this.y + this.height - fluidHeight - total, //
                             fluidHeight, 1);
                 }
+                total += fluidHeight;
             }
-
-            totalAmount += amount;
         }
 
 
@@ -66,13 +65,30 @@ public class MultipleFluidDrawable implements Drawable {
                 this.screen.getTankOverlayV(), //
                 this.width, this.height);
 
-//        if (this.isMouseOver(mouseX, mouseY)) {
-//            List<Text> tooltip = FluidClientUtils.getTooltipWithCapacity(variant.getFluid(), (int) storage.amount, (int) storage.getCapacity());
-//            if (!tooltip.isEmpty()) {
-//                TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-//                context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
-//            }
-//        }
+        if (this.isMouseOver(mouseX, mouseY)) {
+            total = 0;
+            for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluids().object2LongEntrySet()) {
+                FluidVariant variant = entry.getKey();
+                long amount = entry.getLongValue();
+
+                if (!variant.isBlank()) {
+                    int fluidHeight = MathHelper.clamp(Math.round(amount * (float) this.height / this.storage.getCapacity()), 1, this.height);
+
+                    if (mouseX >= screen.getX() + this.x && mouseX < screen.getX() + this.x + this.width //
+                            && mouseY >= screen.getY() + this.y + this.height - fluidHeight - total //
+                            && mouseY < screen.getY() + this.y + this.height - total) {
+                        List<Text> tooltip = FluidTexts.getTooltip(variant.getFluid(), amount, (int) storage.getCapacity());
+                        if (!tooltip.isEmpty()) {
+                            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+                            context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
+                        }
+                    }
+
+                    total += fluidHeight;
+                }
+            }
+
+        }
     }
 
     public boolean isMouseOver(double mouseX, double mouseY) {

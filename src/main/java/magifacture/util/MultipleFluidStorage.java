@@ -9,8 +9,8 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,15 +18,16 @@ import java.util.Iterator;
 
 public class MultipleFluidStorage //
         extends SnapshotParticipant<Object2LongMap<FluidVariant>> //
-        implements Storage<FluidVariant>, NbtSerializable {
+        implements Storage<FluidVariant> {
     @Getter
-    protected Object2LongMap<FluidVariant> fluids = new Object2LongLinkedOpenHashMap<>();
+    protected Object2LongMap<FluidVariant> fluids;
     @Setter
     @Getter
-    private long capacity = 0;
+    private long capacity;
 
     public MultipleFluidStorage(long capacity) {
         this.capacity = capacity;
+        fluids = new Object2LongLinkedOpenHashMap<>();
     }
 
     @Override
@@ -44,6 +45,7 @@ public class MultipleFluidStorage //
         if (resource.isBlank()) {
             return 0;
         }
+
         long total = this.fluids.values().longStream().sum();
         long inserted = Math.min(maxAmount, this.capacity - total);
         if (inserted <= 0) {
@@ -51,6 +53,7 @@ public class MultipleFluidStorage //
         }
 
         long current = this.fluids.getOrDefault(resource, 0);
+        this.updateSnapshots(transaction);
         this.fluids.put(resource, current + inserted);
 
         return inserted;
@@ -67,6 +70,7 @@ public class MultipleFluidStorage //
         if (extracted <= 0) {
             return 0;
         }
+        this.updateSnapshots(transaction);
         this.fluids.put(resource, current - extracted);
 
         return extracted;
@@ -74,60 +78,63 @@ public class MultipleFluidStorage //
 
     @Override
     public @NotNull Iterator<StorageView<FluidVariant>> iterator() {
-        return this.fluids.object2LongEntrySet() //
+        return this.fluids.keySet() //
                 .stream() //
-                .map(entry -> (StorageView<FluidVariant>) new StorageView<FluidVariant>() {
+                .map(variant -> (StorageView<FluidVariant>) new StorageView<FluidVariant>() {
                     @Override
                     public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
-                        if (resource.isBlank()) {
+                        if (resource.isBlank() || !resource.equals(variant)) {
                             return 0;
                         }
 
-                        long current = entry.getLongValue();
+                        long current = fluids.getLong(variant);
                         long extracted = Math.min(maxAmount, current);
                         if (extracted <= 0) {
                             return 0;
                         }
-                        entry.setValue(current - extracted);
+                        MultipleFluidStorage.this.updateSnapshots(transaction);
+                        fluids.put(variant, current - extracted);
 
                         return extracted;
                     }
 
                     @Override
                     public boolean isResourceBlank() {
-                        return entry.getKey().isBlank();
+                        return variant.isBlank();
                     }
 
                     @Override
                     public FluidVariant getResource() {
-                        return entry.getKey();
+                        return variant;
                     }
 
                     @Override
                     public long getAmount() {
-                        return entry.getLongValue();
+                        return fluids.getLong(variant);
                     }
 
                     @Override
                     public long getCapacity() {
                         return MultipleFluidStorage.this.capacity;
                     }
-                }) //
-                .toList() //
-                .iterator();
+                }).iterator();
     }
 
     @Override
+    protected void onFinalCommit() {
+        super.onFinalCommit();
+        this.fluids.object2LongEntrySet().removeIf(entry -> entry.getLongValue() <= 0);
+    }
+
     public void readNbt(NbtCompound nbt) {
         this.fluids.clear();
-        NbtList fluids = nbt.getList("fluids", 10);
+        NbtList fluids = nbt.getList("fluids", NbtElement.COMPOUND_TYPE);
         for (int i = 0; i < fluids.size(); i++) {
             NbtCompound fluid = fluids.getCompound(i);
             this.fluids.put(FluidVariant.fromNbt(fluid.getCompound("fluid")), fluid.getLong("amount"));
         }
     }
 
-    @Override
     public void writeNbt(NbtCompound nbt) {
         NbtList fluids = new NbtList();
         for (Object2LongMap.Entry<FluidVariant> entry : this.fluids.object2LongEntrySet()) {

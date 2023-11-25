@@ -1,7 +1,6 @@
 package magifacture.screen;
 
 import magifacture.screen.slot.NbtSynchronizingSlot;
-import magifacture.util.NbtSerializable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -12,6 +11,8 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public abstract class MagifactureScreenHandler extends ScreenHandler {
     protected final Inventory inventory;
@@ -96,12 +97,8 @@ public abstract class MagifactureScreenHandler extends ScreenHandler {
         }
     }
 
-    protected void addNbtSerializable(NbtSerializable serializable) {
-        this.addSlot(new NbtSynchronizingSlot(() -> {
-            NbtCompound nbt = new NbtCompound();
-            serializable.writeNbt(nbt);
-            return nbt;
-        }, serializable::readNbt));
+    protected void addNbtSlot(Consumer<NbtCompound> nbtReader, Consumer<NbtCompound> nbtWriter) {
+        this.addSlot(new NbtSynchronizingSlot(nbtReader, nbtWriter));
     }
 
     public boolean isInventorySlot(Slot slot) {

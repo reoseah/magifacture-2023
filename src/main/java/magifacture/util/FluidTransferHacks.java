@@ -40,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
-public class FluidUtils {
+public class FluidTransferHacks {
     public static final Codec<FluidVariant> FLUID_VARIANT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Registries.FLUID.getCodec().fieldOf("fluid").forGetter(FluidVariant::getFluid),
             NbtCompound.CODEC.optionalFieldOf("nbt").forGetter(variant -> Optional.ofNullable(variant.getNbt()))

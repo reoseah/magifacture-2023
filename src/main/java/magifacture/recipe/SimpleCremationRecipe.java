@@ -2,7 +2,7 @@ package magifacture.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import magifacture.util.FluidUtils;
+import magifacture.util.FluidTransferHacks;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.enchantment.Enchantment;
@@ -116,7 +116,7 @@ public class SimpleCremationRecipe extends CremationRecipe {
                     RecipeCodecs.CRAFTING_RESULT.fieldOf("result").orElse(ItemStack.EMPTY).forGetter(recipe -> recipe.result),
                     Codec.INT.fieldOf("duration").orElse(defaultDuration).forGetter(recipe -> recipe.duration),
                     Codec.FLOAT.fieldOf("experience").orElse(0.0F).forGetter(recipe -> recipe.experience),
-                    FluidUtils.FLUID_AMOUNT_CODEC.optionalFieldOf("fluid").forGetter(recipe -> Optional.ofNullable(recipe.fluid))
+                    FluidTransferHacks.FLUID_AMOUNT_CODEC.optionalFieldOf("fluid").forGetter(recipe -> Optional.ofNullable(recipe.fluid))
             ).apply(instance, SimpleCremationRecipe::new));
         }
 

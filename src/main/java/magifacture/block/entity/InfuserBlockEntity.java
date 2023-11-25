@@ -6,11 +6,11 @@ import magifacture.block.InfuserBlock;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.InfusionRecipe;
 import magifacture.screen.InfuserScreenHandler;
-import magifacture.util.FluidUtils;
-import magifacture.util.SerializableSingleFluidStorage;
+import magifacture.util.FluidTransferHacks;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerInventory;
@@ -38,22 +38,19 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
 
     public static final BlockEntityType<InfuserBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(InfuserBlockEntity::new, InfuserBlock.INSTANCE).build();
 
-    protected final SerializableSingleFluidStorage tank = new SerializableSingleFluidStorage(CAPACITY_MB) {
-        @Override
-        protected void onFinalCommit() {
-            InfuserBlockEntity.this.markDirty();
-            if (InfuserBlockEntity.this.cachedRecipe != null) {
-                if (InfuserBlockEntity.this.cachedRecipe.isEmpty()) {
-                    InfuserBlockEntity.this.resetCachedRecipe();
-                } else {
-                    InfusionRecipe recipe = InfuserBlockEntity.this.cachedRecipe.get();
-                    if (!recipe.matches(InfuserBlockEntity.this, InfuserBlockEntity.this.world)) {
-                        InfuserBlockEntity.this.resetCachedRecipe();
-                    }
+    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(CAPACITY_MB * 81, () -> {
+        this.markDirty();
+        if (this.cachedRecipe != null) {
+            if (this.cachedRecipe.isEmpty()) {
+                this.resetCachedRecipe();
+            } else {
+                InfusionRecipe recipe = this.cachedRecipe.get();
+                if (!recipe.matches(this, this.world)) {
+                    this.resetCachedRecipe();
                 }
             }
         }
-    };
+    });
 
     public InfuserBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
@@ -70,7 +67,7 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
     }
 
     public static void tickServer(World world, BlockPos pos, BlockState state, InfuserBlockEntity be) {
-        FluidUtils.tryDrainItem(be.tank, be, SLOT_FULL, SLOT_DRAINED, be.world, CAPACITY_MB - be.tank.getAmount());
+        FluidTransferHacks.tryDrainItem(be.tank, be, SLOT_FULL, SLOT_DRAINED, be.world, CAPACITY_MB - be.tank.getAmount());
         be.tickRecipe();
     }
 
@@ -121,7 +118,7 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
         this.tank.writeNbt(tag);
     }
 
-    public SerializableSingleFluidStorage getTank() {
+    public SingleFluidStorage getTank() {
         return this.tank;
     }
 
@@ -141,7 +138,7 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         return slot != SLOT_OUTPUT && slot != SLOT_DRAINED //
-                && (slot != SLOT_FULL || FluidUtils.canDrainItem(stack, FluidVariant.blank()));
+                && (slot != SLOT_FULL || FluidTransferHacks.canDrainItem(stack, FluidVariant.blank()));
     }
 
     @Override

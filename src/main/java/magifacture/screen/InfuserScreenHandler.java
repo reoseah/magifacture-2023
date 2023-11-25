@@ -1,8 +1,8 @@
 package magifacture.screen;
 
 import magifacture.block.entity.InfuserBlockEntity;
-import magifacture.util.SerializableSingleFluidStorage;
 import magifacture.screen.slot.SimpleOutputSlot;
+import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -15,10 +15,11 @@ import net.minecraft.screen.slot.Slot;
 public class InfuserScreenHandler extends MagifactureScreenHandler {
     public static final ScreenHandlerType<InfuserScreenHandler> TYPE = new ScreenHandlerType<>(InfuserScreenHandler::new, FeatureFlags.VANILLA_FEATURES);
     public final PropertyDelegate properties;
-    public final SerializableSingleFluidStorage tank;
+    public final SingleFluidStorage tank;
 
-    private InfuserScreenHandler(int syncId, Inventory inventory, SerializableSingleFluidStorage tank, PlayerInventory playerInv, PropertyDelegate properties) {
+    private InfuserScreenHandler(int syncId, Inventory inventory, SingleFluidStorage tank, PlayerInventory playerInv, PropertyDelegate properties) {
         super(TYPE, syncId, inventory);
+        this.tank = tank;
 
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
@@ -32,8 +33,7 @@ public class InfuserScreenHandler extends MagifactureScreenHandler {
         this.addSlot(new SimpleOutputSlot(this.inventory, InfuserBlockEntity.SLOT_DRAINED, 8, 53));
 
         this.addPlayerSlots(playerInv);
-
-        this.addNbtSerializable(this.tank = tank);
+        this.addNbtSlot(this.tank::readNbt, this.tank::writeNbt);
         this.addProperties(this.properties = properties);
     }
 
@@ -61,6 +61,7 @@ public class InfuserScreenHandler extends MagifactureScreenHandler {
     }
 
     public InfuserScreenHandler(int syncId, PlayerInventory playerInv) {
-        this(syncId, new SimpleInventory(InfuserBlockEntity.INVENTORY_SIZE), new SerializableSingleFluidStorage(InfuserBlockEntity.CAPACITY_MB * 81), playerInv, new ArrayPropertyDelegate(2));
+        this(syncId, new SimpleInventory(InfuserBlockEntity.INVENTORY_SIZE), SingleFluidStorage.withFixedCapacity(InfuserBlockEntity.CAPACITY_MB * 81, () -> {
+        }), playerInv, new ArrayPropertyDelegate(2));
     }
 }

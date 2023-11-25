@@ -7,11 +7,11 @@ import magifacture.block.ExperienceBlock;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.CremationRecipe;
 import magifacture.screen.CrematoriumScreenHandler;
-import magifacture.util.FluidUtils;
-import magifacture.util.SerializableSingleFluidStorage;
+import magifacture.util.FluidTransferHacks;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
@@ -39,7 +39,7 @@ import java.util.Optional;
 public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedInventory {
     public static final BlockEntityType<CrematoriumBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(CrematoriumBlockEntity::new, CrematoriumBlock.INSTANCE).build();
     @Getter
-    protected final SerializableSingleFluidStorage tank = new SerializableSingleFluidStorage(4000 * 81);
+    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(4000 * 81, this::markDirty);
 
     @Getter
     protected int recipeProgress;
@@ -155,7 +155,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     }
 
     public static void tickServer(World world, BlockPos pos, BlockState state, CrematoriumBlockEntity be) {
-        FluidUtils.tryFillItem(be.tank, be, EMPTY_SLOT, FILLED_SLOT);
+        FluidTransferHacks.tryFillItem(be.tank, be, EMPTY_SLOT, FILLED_SLOT);
 
         boolean wasBurning = state.get(Properties.LIT);
 
@@ -192,7 +192,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
 
     protected boolean canAcceptRecipeOutput(CremationRecipe recipe) {
         return this.canFullyAddStack(OUTPUT_SLOT, recipe.getResult(this.world.getRegistryManager()))
-                && (recipe.getFluid() == null || FluidUtils.canFullyInsert(recipe.getFluid(), this.tank));
+                && (recipe.getFluid() == null || FluidTransferHacks.canFullyInsert(recipe.getFluid(), this.tank));
     }
 
     protected void craftRecipe(CremationRecipe recipe) {
@@ -204,7 +204,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
             BlockEntity be = this.world.getBlockEntity(above);
             if (be instanceof AlembicBlockEntity alembic //
                     && (alembic.tank.variant.getFluid() == ExperienceFluid.INSTANCE || alembic.tank.variant.isBlank())) {
-                long change = FluidUtils.insert(new ResourceAmount<>(FluidVariant.of(ExperienceFluid.INSTANCE), experienceMb), alembic.tank);
+                long change = FluidTransferHacks.insert(new ResourceAmount<>(FluidVariant.of(ExperienceFluid.INSTANCE), experienceMb), alembic.tank);
 
                 if (change < experienceMb) {
                     dropExperience(this.world, above.up(), this.world.random, probabilityRound((experienceMb - change) / (float) ExperienceFluid.MILLIBUCKET_PER_XP / 81F, this.world.random));
@@ -217,7 +217,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
         this.addStack(OUTPUT_SLOT, recipe.craft(this, this.world.getRegistryManager()));
 
         if (recipe.getFluid() != null) {
-            FluidUtils.insert(recipe.getFluid(), this.tank);
+            FluidTransferHacks.insert(recipe.getFluid(), this.tank);
         }
         ItemStack input = this.slots.get(INPUT_SLOT);
         input.decrement(recipe.getInputCount());

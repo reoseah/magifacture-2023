@@ -6,7 +6,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import magifacture.block.entity.InfuserBlockEntity;
-import magifacture.util.FluidUtils;
+import magifacture.util.FluidTransferHacks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -164,7 +164,7 @@ public class ShapedInfusionRecipe extends InfusionRecipe {
         public ShapedInfusionRecipe read(PacketByteBuf buf) {
             int width = buf.readVarInt();
             int height = buf.readVarInt();
-            ResourceAmount<FluidVariant> fluid = FluidUtils.fromPacket(buf);
+            ResourceAmount<FluidVariant> fluid = FluidTransferHacks.fromPacket(buf);
             DefaultedList<Ingredient> ingredients = DefaultedList.ofSize(width * height, Ingredient.EMPTY);
             for (int i = 0; i < ingredients.size(); i++) {
                 ingredients.set(i, Ingredient.fromPacket(buf));
@@ -179,7 +179,7 @@ public class ShapedInfusionRecipe extends InfusionRecipe {
         public void write(PacketByteBuf buf, ShapedInfusionRecipe recipe) {
             buf.writeVarInt(recipe.width);
             buf.writeVarInt(recipe.height);
-            FluidUtils.write(buf, recipe.fluid);
+            FluidTransferHacks.write(buf, recipe.fluid);
             for (Ingredient ingredient : recipe.inputs) {
                 ingredient.write(buf);
             }
@@ -198,7 +198,7 @@ public class ShapedInfusionRecipe extends InfusionRecipe {
                     instance -> instance.group( //
                             Codecs.strictUnboundedMap(ShapedRecipe.Serializer.KEY_ENTRY_CODEC, Ingredient.DISALLOW_EMPTY_CODEC).fieldOf("key").forGetter(recipe -> recipe.key), //
                             ShapedRecipe.Serializer.PATTERN_CODEC.fieldOf("pattern").forGetter(recipe -> recipe.pattern), //
-                            FluidUtils.FLUID_AMOUNT_CODEC.fieldOf("fluid").forGetter(recipe -> recipe.fluid), //
+                            FluidTransferHacks.FLUID_AMOUNT_CODEC.fieldOf("fluid").forGetter(recipe -> recipe.fluid), //
                             RecipeCodecs.CRAFTING_RESULT.fieldOf("result").forGetter(recipe -> recipe.result), //
                             Codec.INT.fieldOf("duration").orElse(DEFAULT_DURATION).forGetter(recipe -> recipe.duration) //
                     ).apply(instance, RawRecipe::new));

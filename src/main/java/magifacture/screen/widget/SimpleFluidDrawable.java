@@ -1,7 +1,8 @@
 package magifacture.screen.widget;
 
 import magifacture.screen.MagifactureScreen;
-import magifacture.util.FluidClientUtils;
+import magifacture.util.FluidRendering;
+import magifacture.util.FluidTexts;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.client.MinecraftClient;
@@ -38,12 +39,12 @@ public class SimpleFluidDrawable implements Drawable {
         if (!variant.isBlank()) {
             int fluidHeight = MathHelper.clamp(Math.round(this.storage.amount * (float) this.height / this.storage.getCapacity()), 1, this.height);
 
-            FluidClientUtils.drawFluidColumn(context, variant, //
+            FluidRendering.drawFluidColumn(context, variant, //
                     this.screen.getX() + this.x, //
                     this.screen.getY() + this.y + this.height - fluidHeight, //
                     fluidHeight, 1);
             if (this.width > 16) {
-                FluidClientUtils.drawFluidColumn(context, variant, //
+                FluidRendering.drawFluidColumn(context, variant, //
                         this.screen.getX() + this.x + 16, //
                         this.screen.getY() + this.y + this.height - fluidHeight, //
                         fluidHeight, 1);
@@ -58,7 +59,7 @@ public class SimpleFluidDrawable implements Drawable {
                 this.width, this.height);
 
         if (this.isMouseOver(mouseX, mouseY)) {
-            List<Text> tooltip = FluidClientUtils.getTooltipWithCapacity(variant.getFluid(), (int) storage.amount, (int) storage.getCapacity());
+            List<Text> tooltip = FluidTexts.getTooltip(variant.getFluid(), (int) storage.amount, (int) storage.getCapacity());
             if (!tooltip.isEmpty()) {
                 TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
                 context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
