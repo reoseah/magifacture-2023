@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
@@ -65,8 +66,11 @@ public class MultipleFluidDrawable implements Drawable {
                 this.screen.getTankOverlayV(), //
                 this.width, this.height);
 
+        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+
         if (this.isMouseOver(mouseX, mouseY)) {
-            total = 0;
+            int totalHeight = 0;
+            long totalAmount = 0;
             for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluids().object2LongEntrySet()) {
                 FluidVariant variant = entry.getKey();
                 long amount = entry.getLongValue();
@@ -75,19 +79,21 @@ public class MultipleFluidDrawable implements Drawable {
                     int fluidHeight = MathHelper.clamp(Math.round(amount * (float) this.height / this.storage.getCapacity()), 1, this.height);
 
                     if (mouseX >= screen.getX() + this.x && mouseX < screen.getX() + this.x + this.width //
-                            && mouseY >= screen.getY() + this.y + this.height - fluidHeight - total //
-                            && mouseY < screen.getY() + this.y + this.height - total) {
+                            && mouseY >= screen.getY() + this.y + this.height - fluidHeight - totalHeight //
+                            && mouseY < screen.getY() + this.y + this.height - totalHeight) {
                         List<Text> tooltip = FluidTexts.getTooltip(variant.getFluid(), amount, (int) storage.getCapacity());
-                        if (!tooltip.isEmpty()) {
-                            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-                            context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
-                        }
+                        context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
                     }
 
-                    total += fluidHeight;
+                    totalHeight += fluidHeight;
+                    totalAmount += amount;
                 }
             }
-
+            if (mouseY < screen.getY() + this.y + this.height - totalHeight) {
+                long capacity = storage.getCapacity();
+                List<Text> tooltip = FluidTexts.getTooltip(Fluids.EMPTY, capacity - totalAmount, capacity);
+                context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
+            }
         }
     }
 
