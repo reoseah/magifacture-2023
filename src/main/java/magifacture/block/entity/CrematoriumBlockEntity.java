@@ -4,6 +4,7 @@ import lombok.Getter;
 import magifacture.block.AlembicBlock;
 import magifacture.block.CrematoriumBlock;
 import magifacture.block.ExperienceBlock;
+import magifacture.block.entity.component.FuelHandler;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.CremationRecipe;
 import magifacture.screen.CrematoriumScreenHandler;
@@ -37,7 +38,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull", "UnstableApiUsage"})
-public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedInventory {
+public class CrematoriumBlockEntity extends MagifactureBlockEntity implements SidedInventory {
+    public static final int INPUT_SLOT = 0, FUEL_SLOT = 1, OUTPUT_SLOT = 2, EMPTY_SLOT = 3, FILLED_SLOT = 4;
+
+    public static final int[] SLOTS_TOP = {INPUT_SLOT};
+    public static final int[] SLOTS_SIDE = {FUEL_SLOT, EMPTY_SLOT};
+    public static final int[] SLOTS_BOTTOM = {OUTPUT_SLOT, FILLED_SLOT, FUEL_SLOT};
+
     public static final BlockEntityType<CrematoriumBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(CrematoriumBlockEntity::new, CrematoriumBlock.INSTANCE).build();
     @Getter
     protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(4000 * 81, this::markDirty);
@@ -45,6 +52,46 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     @Getter
     protected int recipeProgress;
     protected @Nullable Optional<? extends CremationRecipe> cachedRecipe;
+
+    protected final FuelHandler fuel = new FuelHandler(this, FUEL_SLOT) {
+        @Override
+        protected boolean canStartBurning() {
+            CremationRecipe recipe = CrematoriumBlockEntity.this.findRecipe(world);
+            return recipe != null && CrematoriumBlockEntity.this.canAcceptRecipeOutput(recipe);
+        }
+
+        @Override
+        protected void onBurningStarted() {
+            world.setBlockState(pos, getCachedState().with(Properties.LIT, true));
+        }
+
+        @Override
+        protected void onBurningTick() {
+            CremationRecipe recipe = CrematoriumBlockEntity.this.findRecipe(world);
+            if (recipe != null && CrematoriumBlockEntity.this.canAcceptRecipeOutput(recipe)) {
+                CrematoriumBlockEntity.this.recipeProgress++;
+                if (CrematoriumBlockEntity.this.recipeProgress >= recipe.getDuration()) {
+                    CrematoriumBlockEntity.this.craftRecipe(recipe);
+                    CrematoriumBlockEntity.this.recipeProgress = 0;
+                }
+            } else if (CrematoriumBlockEntity.this.recipeProgress > 0) {
+                CrematoriumBlockEntity.this.recipeProgress = 0;
+            }
+        }
+
+        @Override
+        protected void onBurningEnded() {
+            world.setBlockState(pos, getCachedState().with(Properties.LIT, false));
+        }
+
+        @Override
+        protected void onNonBurningTick() {
+            if (CrematoriumBlockEntity.this.recipeProgress > 0) {
+                CrematoriumBlockEntity.this.recipeProgress = Math.max(CrematoriumBlockEntity.this.recipeProgress - 2, 0);
+                CrematoriumBlockEntity.this.markDirty();
+            }
+        }
+    };
 
     public CrematoriumBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
@@ -60,15 +107,12 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
         return DefaultedList.ofSize(5, ItemStack.EMPTY);
     }
 
-    @Override
-    protected int getFuelSlot() {
-        return FUEL_SLOT;
-    }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
         this.tank.readNbt(nbt);
+        this.fuel.readNbt(nbt);
         this.recipeProgress = Math.max(nbt.getInt("RecipeProgress"), 0);
     }
 
@@ -77,6 +121,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
         super.writeNbt(nbt);
         this.tank.writeNbt(nbt);
         nbt.putInt("RecipeProgress", this.recipeProgress);
+        this.fuel.writeNbt(nbt);
     }
 
     @Override
@@ -100,12 +145,6 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     }
 
     // region SidedInventory
-    public static final int INPUT_SLOT = 0, FUEL_SLOT = 1, OUTPUT_SLOT = 2, EMPTY_SLOT = 3, FILLED_SLOT = 4;
-
-    public static final int[] SLOTS_TOP = {INPUT_SLOT};
-    public static final int[] SLOTS_SIDE = {FUEL_SLOT, EMPTY_SLOT};
-    public static final int[] SLOTS_BOTTOM = {OUTPUT_SLOT, FILLED_SLOT, FUEL_SLOT};
-
     @Override
     public int[] getAvailableSlots(Direction side) {
         switch (side) {
@@ -158,37 +197,8 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     public static void tickServer(World world, BlockPos pos, BlockState state, CrematoriumBlockEntity be) {
         FluidTransferUtils.tryFillItem(be.tank, be, EMPTY_SLOT, FILLED_SLOT, Integer.MAX_VALUE);
 
-        boolean wasBurning = state.get(Properties.LIT);
-
-        if (be.fuelLeft > 0) {
-            be.fuelLeft--;
-            be.markDirty();
-        }
-
-        CremationRecipe recipe = be.findRecipe(world);
-        if (recipe != null && be.canAcceptRecipeOutput(recipe)) {
-            if (be.fuelLeft == 0 && be.canConsumeFuel()) {
-                be.consumeFuel();
-            }
-            if (be.fuelLeft > 0) {
-                be.fuelLeft--;
-                be.recipeProgress++;
-                if (be.recipeProgress >= recipe.getDuration()) {
-                    be.craftRecipe(recipe);
-                    be.recipeProgress = 0;
-                }
-            } else {
-                be.recipeProgress = Math.max(be.recipeProgress - 2, 0);
-            }
-            be.markDirty();
-        } else if (be.recipeProgress > 0) {
-            be.recipeProgress = 0;
-            be.markDirty();
-        }
-        boolean isBurning = be.fuelLeft > 0;
-        if (isBurning != wasBurning) {
-            world.setBlockState(pos, state.with(Properties.LIT, isBurning));
-        }
+        be.fuel.tick();
+        be.markDirty();
     }
 
     protected boolean canAcceptRecipeOutput(CremationRecipe recipe) {
@@ -240,5 +250,13 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
 
     public int getRecipeDuration() {
         return this.cachedRecipe != null && this.cachedRecipe.isPresent() ? this.cachedRecipe.get().getDuration() : 0;
+    }
+
+    public int getFuelLeft() {
+        return this.fuel.getFuelLeft();
+    }
+
+    public int getFuelDuration() {
+        return this.fuel.getFuelDuration();
     }
 }
