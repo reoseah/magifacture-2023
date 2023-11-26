@@ -31,8 +31,6 @@ public abstract class InfusionRecipe implements Recipe<InfuserBlockEntity> {
         return TYPE;
     }
 
-
-
     @Override
     @Environment(EnvType.CLIENT)
     public ItemStack createIcon() {

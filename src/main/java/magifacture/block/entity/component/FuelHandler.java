@@ -78,7 +78,7 @@ public abstract class FuelHandler {
         if (this.fuelLeft > 0) {
             this.onBurningTick();
 
-            if (this.fuelLeft == 1 && !this.canConsumeFuel()) {
+            if (this.fuelLeft == 1 && (!this.canConsumeFuel() || !this.canStartBurning())) {
                 this.onBurningEnded();
             }
 

@@ -1,12 +1,13 @@
 package magifacture.block.entity;
 
 import it.unimi.dsi.fastutil.ints.IntArrays;
+import lombok.Getter;
 import magifacture.block.ExperienceBlock;
 import magifacture.block.InfuserBlock;
+import magifacture.block.entity.component.RecipeHandler;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.InfusionRecipe;
 import magifacture.screen.InfuserScreenHandler;
-import magifacture.util.FluidTransferHacks;
 import magifacture.util.FluidTransferUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -24,13 +25,11 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull", "UnstableApiUsage"})
-public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> implements SidedInventory {
+public class InfuserBlockEntity extends MagifactureBlockEntity implements SidedInventory {
     public static final int CAPACITY_MB = 4000;
 
     public static final int[] INPUT_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -39,18 +38,50 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
 
     public static final BlockEntityType<InfuserBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(InfuserBlockEntity::new, InfuserBlock.INSTANCE).build();
 
-    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(CAPACITY_MB * 81, () -> {
-        this.markDirty();
-        if (this.cachedRecipe != null) {
-            if (this.cachedRecipe.isEmpty()) {
-                this.resetCachedRecipe();
-            } else {
-                InfusionRecipe recipe = this.cachedRecipe.get();
-                if (!recipe.matches(this, this.world)) {
-                    this.resetCachedRecipe();
+    public final RecipeHandler<InfusionRecipe> recipeHandler = new RecipeHandler<>(this) {
+        @SuppressWarnings("OptionalAssignedToNull")
+        @Override
+        protected Optional<InfusionRecipe> findRecipe() {
+            if (world == null) {
+                return null;
+            }
+            return world.getRecipeManager() //
+                    .getFirstMatch(InfusionRecipe.TYPE, InfuserBlockEntity.this, world) //
+                    .map(RecipeEntry::value);
+        }
+
+        @Override
+        public boolean canCraft(InfusionRecipe recipe) {
+            return recipe.matches(InfuserBlockEntity.this, world) //
+                    && canFullyAddStack(SLOT_OUTPUT, recipe.craft(InfuserBlockEntity.this, world.getRegistryManager()));
+
+        }
+
+        @Override
+        protected void craftRecipe(InfusionRecipe recipe) {
+            addStack(SLOT_OUTPUT, recipe.craft(InfuserBlockEntity.this, getWorld().getRegistryManager()));
+            tank.amount -= recipe.getFluidCost(InfuserBlockEntity.this).amount();
+
+            if (tank.amount == 0) {
+                tank.variant = FluidVariant.blank();
+            }
+            for (int i = 0; i < 9; i++) {
+                if (!getStack(i).isEmpty()) {
+                    getStack(i).decrement(1);
                 }
             }
         }
+
+        @Override
+        protected int getRecipeDuration(InfusionRecipe recipe) {
+            return recipe.getDuration(InfuserBlockEntity.this);
+        }
+    };
+
+    @Getter
+    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(CAPACITY_MB * 81, () -> {
+        this.markDirty();
+        this.recipeHandler.resetCachedRecipe();
     });
 
     public InfuserBlockEntity(BlockPos pos, BlockState state) {
@@ -69,58 +100,21 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
 
     public static void tickServer(World world, BlockPos pos, BlockState state, InfuserBlockEntity be) {
         FluidTransferUtils.tryDrainItem(be.tank, be, SLOT_FULL, SLOT_DRAINED, CAPACITY_MB - be.tank.getAmount());
-        be.tickRecipe();
+        be.recipeHandler.tickRecipe(1);
     }
 
     @Override
-    protected int getInputsCount() {
-        return 9;
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        this.tank.readNbt(nbt);
+        this.recipeHandler.readNbt(nbt);
     }
 
     @Override
-    protected Optional<InfusionRecipe> findRecipeInternal(@NotNull World world) {
-        return world.getRecipeManager().getFirstMatch(InfusionRecipe.TYPE, this, world).map(RecipeEntry::value);
-    }
-
-    @Override
-    protected boolean canCraft(InfusionRecipe recipe) {
-        return recipe.matches(this, this.world) && this.canFullyAddStack(SLOT_OUTPUT, recipe.craft(this, this.world.getRegistryManager()));
-    }
-
-    @Override
-    protected void craftRecipe(InfusionRecipe recipe) {
-        this.addStack(SLOT_OUTPUT, recipe.craft(this, this.getWorld().getRegistryManager()));
-        this.tank.amount -= recipe.getFluidCost(this).amount();
-
-        if (this.tank.amount == 0) {
-            this.tank.variant = FluidVariant.blank();
-        }
-        for (int i = 0; i < 9; i++) {
-            if (!this.getStack(i).isEmpty()) {
-                this.getStack(i).decrement(1);
-            }
-        }
-    }
-
-    @Override
-    protected int getRecipeDuration(InfusionRecipe recipe) {
-        return 100;
-    }
-
-    @Override
-    public void readNbt(NbtCompound tag) {
-        super.readNbt(tag);
-        this.tank.readNbt(tag);
-    }
-
-    @Override
-    public void writeNbt(NbtCompound tag) {
-        super.writeNbt(tag);
-        this.tank.writeNbt(tag);
-    }
-
-    public SingleFluidStorage getTank() {
-        return this.tank;
+    public void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        this.tank.writeNbt(nbt);
+        this.recipeHandler.writeNbt(nbt);
     }
 
     @Override
@@ -152,5 +146,13 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
         if (this.tank.variant.getFluid() == ExperienceFluid.INSTANCE) {
             ExperienceBlock.dropExperience(this.world, this.pos, this.world.random, this.tank.amount / (float) FluidConstants.BUCKET);
         }
+    }
+
+    public int getRecipeProgress() {
+        return this.recipeHandler.getRecipeProgress();
+    }
+
+    public int getRecipeDuration() {
+        return this.recipeHandler.getRecipeDuration();
     }
 }

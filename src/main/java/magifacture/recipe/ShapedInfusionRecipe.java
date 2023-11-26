@@ -6,7 +6,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import magifacture.block.entity.InfuserBlockEntity;
-import magifacture.util.FluidTransferHacks;
+import magifacture.util.FluidTransferUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -201,7 +201,7 @@ public class ShapedInfusionRecipe extends InfusionRecipe {
                     instance -> instance.group( //
                             Codecs.strictUnboundedMap(ShapedRecipe.Serializer.KEY_ENTRY_CODEC, Ingredient.DISALLOW_EMPTY_CODEC).fieldOf("key").forGetter(recipe -> recipe.key), //
                             ShapedRecipe.Serializer.PATTERN_CODEC.fieldOf("pattern").forGetter(recipe -> recipe.pattern), //
-                            FluidTransferHacks.FLUID_AMOUNT_CODEC.fieldOf("fluid").forGetter(recipe -> recipe.fluid), //
+                            FluidTransferUtils.FLUID_AMOUNT_CODEC.fieldOf("fluid").forGetter(recipe -> recipe.fluid), //
                             RecipeCodecs.CRAFTING_RESULT.fieldOf("result").forGetter(recipe -> recipe.result), //
                             Codec.INT.fieldOf("duration").orElse(DEFAULT_DURATION).forGetter(recipe -> recipe.duration) //
                     ).apply(instance, RawRecipe::new));
