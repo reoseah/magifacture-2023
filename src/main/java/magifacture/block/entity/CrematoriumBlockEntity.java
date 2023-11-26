@@ -8,6 +8,7 @@ import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.CremationRecipe;
 import magifacture.screen.CrematoriumScreenHandler;
 import magifacture.util.FluidTransferHacks;
+import magifacture.util.FluidTransferUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -155,7 +156,7 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     }
 
     public static void tickServer(World world, BlockPos pos, BlockState state, CrematoriumBlockEntity be) {
-        FluidTransferHacks.tryFillItem(be.tank, be, EMPTY_SLOT, FILLED_SLOT);
+        FluidTransferUtils.tryFillItem(be.tank, be, EMPTY_SLOT, FILLED_SLOT, Integer.MAX_VALUE);
 
         boolean wasBurning = state.get(Properties.LIT);
 
@@ -207,11 +208,11 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
                 long change = FluidTransferHacks.insert(new ResourceAmount<>(FluidVariant.of(ExperienceFluid.INSTANCE), experienceMb), alembic.tank);
 
                 if (change < experienceMb) {
-                    dropExperience(this.world, above.up(), this.world.random, probabilityRound((experienceMb - change) / (float) ExperienceFluid.MILLIBUCKET_PER_XP / 81F, this.world.random));
+                    dropExperience(this.world, above.up(), probabilityRound((experienceMb - change) / (float) ExperienceFluid.MILLIBUCKET_PER_XP / 81F, this.world.random));
                 }
             }
         } else {
-            dropExperience(this.world, above, this.world.random, probabilityRound(experience, this.world.random));
+            dropExperience(this.world, above, probabilityRound(experience, this.world.random));
         }
 
         this.addStack(OUTPUT_SLOT, recipe.craft(this, this.world.getRegistryManager()));
@@ -225,10 +226,11 @@ public class CrematoriumBlockEntity extends FueledBlockEntity implements SidedIn
     }
 
     private static int probabilityRound(float value, Random random) {
-        return ((int) value) + random.nextFloat() <= ((value - (int) value)) ? 1 : 0;
+        int floor = (int) value;
+        return floor + (random.nextFloat() <= value - floor ? 1 : 0);
     }
 
-    public static void dropExperience(World world, BlockPos pos, Random random, int xp) {
+    public static void dropExperience(World world, BlockPos pos, int xp) {
         while (xp > 0) {
             int orbSize = ExperienceOrbEntity.roundToOrbSize(xp);
             world.spawnEntity(new ExperienceOrbEntity(world, pos.getX() + 0.5F, pos.getY(), pos.getZ() + 0.5F, orbSize));

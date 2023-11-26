@@ -7,6 +7,7 @@ import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.InfusionRecipe;
 import magifacture.screen.InfuserScreenHandler;
 import magifacture.util.FluidTransferHacks;
+import magifacture.util.FluidTransferUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -67,7 +68,7 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
     }
 
     public static void tickServer(World world, BlockPos pos, BlockState state, InfuserBlockEntity be) {
-        FluidTransferHacks.tryDrainItem(be.tank, be, SLOT_FULL, SLOT_DRAINED, be.world, CAPACITY_MB - be.tank.getAmount());
+        FluidTransferUtils.tryDrainItem(be.tank, be, SLOT_FULL, SLOT_DRAINED, CAPACITY_MB - be.tank.getAmount());
         be.tickRecipe();
     }
 
@@ -138,7 +139,7 @@ public class InfuserBlockEntity extends ProcessingBlockEntity<InfusionRecipe> im
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         return slot != SLOT_OUTPUT && slot != SLOT_DRAINED //
-                && (slot != SLOT_FULL || FluidTransferHacks.canDrainItem(stack, FluidVariant.blank()));
+                && (slot != SLOT_FULL || FluidTransferUtils.canDrain(stack));
     }
 
     @Override

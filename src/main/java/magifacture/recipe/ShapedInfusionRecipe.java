@@ -164,7 +164,9 @@ public class ShapedInfusionRecipe extends InfusionRecipe {
         public ShapedInfusionRecipe read(PacketByteBuf buf) {
             int width = buf.readVarInt();
             int height = buf.readVarInt();
-            ResourceAmount<FluidVariant> fluid = FluidTransferHacks.fromPacket(buf);
+            FluidVariant variant = FluidVariant.fromPacket(buf);
+            long amount = buf.readVarLong();
+            ResourceAmount<FluidVariant> fluid = new ResourceAmount<>(variant, amount);
             DefaultedList<Ingredient> ingredients = DefaultedList.ofSize(width * height, Ingredient.EMPTY);
             for (int i = 0; i < ingredients.size(); i++) {
                 ingredients.set(i, Ingredient.fromPacket(buf));
@@ -179,7 +181,8 @@ public class ShapedInfusionRecipe extends InfusionRecipe {
         public void write(PacketByteBuf buf, ShapedInfusionRecipe recipe) {
             buf.writeVarInt(recipe.width);
             buf.writeVarInt(recipe.height);
-            FluidTransferHacks.write(buf, recipe.fluid);
+            recipe.fluid.resource().toPacket(buf);
+            buf.writeLong(recipe.fluid.amount());
             for (Ingredient ingredient : recipe.inputs) {
                 ingredient.write(buf);
             }

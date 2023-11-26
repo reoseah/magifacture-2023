@@ -3,10 +3,21 @@ package magifacture.recipe;
 import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.Pair;
 import magifacture.block.entity.InfuserBlockEntity;
-import magifacture.util.FluidTransferHacks;
+import magifacture.mixin.AccessibleBucketItem;
+import magifacture.mixin.AccessibleEmptyItemFluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.base.EmptyItemFluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.item.BucketItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeSerializer;
@@ -15,12 +26,10 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemFillingInfusionRecipe extends InfusionRecipe {
-    public static final RecipeSerializer<ItemFillingInfusionRecipe> SERIALIZER = new RecipeSerializer<ItemFillingInfusionRecipe>() {
-        private final Codec<ItemFillingInfusionRecipe> codec = Codec.unit(ItemFillingInfusionRecipe::new);
-
+    public static final RecipeSerializer<ItemFillingInfusionRecipe> SERIALIZER = new RecipeSerializer<>() {
         @Override
         public Codec<ItemFillingInfusionRecipe> codec() {
-            return this.codec;
+            return Codec.unit(ItemFillingInfusionRecipe::new);
         }
 
         @Override
@@ -33,10 +42,6 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
 
         }
     };
-
-    public ItemFillingInfusionRecipe() {
-        super();
-    }
 
     @Override
     public ResourceAmount<FluidVariant> getFluidCost(@Nullable InfuserBlockEntity inventory) {
@@ -55,7 +60,7 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
             return new ResourceAmount<>(FluidVariant.blank(), 0);
         }
         Fluid fluid = inventory.getTank().variant.getFluid();
-        return new ResourceAmount<>(FluidVariant.of(fluid), FluidTransferHacks.findFilledStack(stack, fluid).value());
+        return new ResourceAmount<>(FluidVariant.of(fluid), findFilledStack(stack, fluid).value());
     }
 
     @Override
@@ -84,10 +89,11 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
             return false;
         }
         Fluid fluid = inventory.getTank().variant.getFluid();
-        Pair<ItemStack, Long> filledStack = FluidTransferHacks.findFilledStack(stack, fluid);
+        Pair<ItemStack, Long> filledStack = findFilledStack(stack, fluid);
         return filledStack != null
                 && filledStack.value() <= inventory.getTank().amount;
     }
+
 
     @Override
     public ItemStack craft(InfuserBlockEntity inventory, DynamicRegistryManager registries) {
@@ -105,7 +111,43 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
         if (stack == null) {
             return ItemStack.EMPTY;
         }
-        return FluidTransferHacks.findFilledStack(stack, inventory.getTank().variant.getFluid()).key();
+        return findFilledStack(stack, inventory.getTank().variant.getFluid()).key();
+    }
+
+    public static Pair<ItemStack, Long> findFilledStack(ItemStack emptyStack, Fluid fluid) {
+        Item item = emptyStack.getItem();
+        if (isEmptyBucket(item)) {
+            Item fluidBucket = fluid.getBucketItem();
+            if (isValidBucketPair(item, fluidBucket, fluid)) {
+                return Pair.of(new ItemStack(fluidBucket), FluidConstants.BUCKET);
+            }
+        }
+        return findFilledStackFromTransferApi(emptyStack, fluid);
+    }
+
+    @Nullable
+    public static Pair<ItemStack, Long> findFilledStackFromTransferApi(ItemStack emptyStack, Fluid fluid) {
+        Storage<FluidVariant> storage = FluidStorage.ITEM.find(emptyStack, ContainerItemContext.withConstant(emptyStack));
+        if (storage instanceof CombinedStorage<FluidVariant, ?> combined) {
+            for (Storage<FluidVariant> part : combined.parts) {
+                if (part instanceof EmptyItemFluidStorage emptyStorage) {
+                    AccessibleEmptyItemFluidStorage accessor = (AccessibleEmptyItemFluidStorage) (Object) emptyStorage;
+                    if (accessor.getInsertableFluid() == fluid) {
+                        ItemStack filledStack = accessor.getEmptyToFullMapping().apply(ItemVariant.of(emptyStack)).toStack();
+                        return Pair.of(filledStack, accessor.getInsertableAmount());
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean isEmptyBucket(Item item) {
+        return item instanceof BucketItem bucket && ((AccessibleBucketItem) bucket).getFluid() == Fluids.EMPTY;
+    }
+
+    public static boolean isValidBucketPair(Item emptyBucket, Item filledBucket, Fluid fluid) {
+        return filledBucket.getRecipeRemainder() == emptyBucket && ((AccessibleBucketItem) filledBucket).getFluid() == fluid;
     }
 
     @Override
