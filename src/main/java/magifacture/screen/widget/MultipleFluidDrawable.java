@@ -42,19 +42,16 @@ public class MultipleFluidDrawable implements Drawable {
             long amount = entry.getLongValue();
 
             if (!variant.isBlank()) {
-                int fluidHeight = MathHelper.clamp(Math.round(amount * (float) this.height / this.storage.getCapacity()), 1, this.height);
+                int height = MathHelper.clamp(Math.round(amount * (float) this.height / this.storage.getCapacity()), 1, this.height);
+                int y = this.screen.getY() + this.y + MathHelper.clamp(this.height - height - total, 0, this.height - total);
 
                 FluidRendering.drawFluidColumn(context, variant, //
-                        this.screen.getX() + this.x, //
-                        this.screen.getY() + this.y + this.height - fluidHeight - total, //
-                        fluidHeight, 1);
+                        this.screen.getX() + this.x, y, height, 1);
                 if (this.width > 16) {
                     FluidRendering.drawFluidColumn(context, variant, //
-                            this.screen.getX() + this.x + 16, //
-                            this.screen.getY() + this.y + this.height - fluidHeight - total, //
-                            fluidHeight, 1);
+                            this.screen.getX() + this.x + 16, y, height, 1);
                 }
-                total += fluidHeight;
+                total += height;
             }
         }
 

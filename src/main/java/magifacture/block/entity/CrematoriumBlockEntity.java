@@ -33,87 +33,20 @@ import net.minecraft.world.World;
 
 import java.util.Optional;
 
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull", "UnstableApiUsage"})
+
 public class CrematoriumBlockEntity extends MagifactureBlockEntity implements SidedInventory {
     public static final int INPUT_SLOT = 0, FUEL_SLOT = 1, OUTPUT_SLOT = 2, EMPTY_SLOT = 3, FILLED_SLOT = 4;
 
     public static final BlockEntityType<CrematoriumBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(CrematoriumBlockEntity::new, CrematoriumBlock.INSTANCE).build();
+
     @Getter
     protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(4000 * 81, this::markDirty);
-
-    protected final RecipeHandler<CremationRecipe> recipeHandler = new RecipeHandler<CremationRecipe>(this) {
-        @Override
-        protected Optional<CremationRecipe> findRecipe() {
-            if (CrematoriumBlockEntity.this.world == null) {
-                return null;
-            }
-            return CrematoriumBlockEntity.this.world.getRecipeManager() //
-                    .getFirstMatch(CremationRecipe.TYPE, CrematoriumBlockEntity.this, world) //
-                    .map(RecipeEntry::value);
-        }
-
-        @Override
-        public boolean canCraft(CremationRecipe recipe) {
-            ItemStack result = recipe.getResult(CrematoriumBlockEntity.this.world.getRegistryManager());
-            return CrematoriumBlockEntity.this.canFullyAddStack(OUTPUT_SLOT, result) //
-                    && FluidTransferUtils.canFullyInsert(recipe.getFluid(), CrematoriumBlockEntity.this.tank);
-        }
-
-        @Override
-        protected void craftRecipe(CremationRecipe recipe) {
-            float experience = recipe.getExperience(CrematoriumBlockEntity.this);
-            addExperienceToAlembicOrDrop(experience);
-
-            CrematoriumBlockEntity.this.addStack(OUTPUT_SLOT, recipe.craft(CrematoriumBlockEntity.this, CrematoriumBlockEntity.this.world.getRegistryManager()));
-
-            if (recipe.getFluid() != null) {
-                try (Transaction transaction = Transaction.openOuter()) {
-                    CrematoriumBlockEntity.this.tank.insert(recipe.getFluid().resource(), recipe.getFluid().amount(), transaction);
-                    transaction.commit();
-                }
-            }
-            ItemStack input = CrematoriumBlockEntity.this.slots.get(INPUT_SLOT);
-            input.decrement(recipe.getInputCount());
-            CrematoriumBlockEntity.this.setStack(INPUT_SLOT, input); // updates cached recipe
-        }
-
-        @Override
-        protected int getRecipeDuration(CremationRecipe recipe) {
-            return recipe.getDuration();
-        }
-    };
-
-    protected final FuelHandler fuelHandler = new FuelHandler(this, FUEL_SLOT) {
-        @Override
-        protected boolean canStartBurning() {
-            return CrematoriumBlockEntity.this.recipeHandler.canCraft();
-        }
-
-        @Override
-        protected void onBurningStarted() {
-            world.setBlockState(pos, getCachedState().with(Properties.LIT, true));
-        }
-
-        @Override
-        protected void onBurningTick() {
-            recipeHandler.tickRecipe(1);
-        }
-
-        @Override
-        protected void onBurningEnded() {
-            world.setBlockState(pos, getCachedState().with(Properties.LIT, false));
-        }
-
-        @Override
-        protected void onNonBurningTick() {
-            recipeHandler.tickRecipe(-2);
-        }
-    };
+    protected final RecipeHandler<CremationRecipe, CrematoriumBlockEntity> recipeHandler = new CrematoriumRecipeHandler(this);
+    protected final FuelHandler<CrematoriumBlockEntity> fuelHandler = new CrematoriumFuelHandler(this);
 
     public CrematoriumBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
     }
-
 
     @Override
     protected DefaultedList<ItemStack> createSlotsList() {
@@ -154,6 +87,7 @@ public class CrematoriumBlockEntity extends MagifactureBlockEntity implements Si
         return new CrematoriumScreenHandler(syncId, this, playerInventory);
     }
 
+    @SuppressWarnings("unused")
     public static void tickServer(World world, BlockPos pos, BlockState state, CrematoriumBlockEntity be) {
         FluidTransferUtils.tryFillItem(be.tank, be, EMPTY_SLOT, FILLED_SLOT, Integer.MAX_VALUE);
 
@@ -189,6 +123,70 @@ public class CrematoriumBlockEntity extends MagifactureBlockEntity implements Si
     }
     //endregion
 
+    public int getRecipeProgress() {
+        return this.recipeHandler.getRecipeProgress();
+    }
+
+    public int getRecipeDuration() {
+        return this.recipeHandler.getRecipeDuration();
+    }
+
+    public int getFuelLeft() {
+        return this.fuelHandler.getFuelLeft();
+    }
+
+    public int getFuelDuration() {
+        return this.fuelHandler.getFuelDuration();
+    }
+
+    @SuppressWarnings({"OptionalAssignedToNull", "UnstableApiUsage"})
+    private static class CrematoriumRecipeHandler extends RecipeHandler<CremationRecipe, CrematoriumBlockEntity> {
+        public CrematoriumRecipeHandler(CrematoriumBlockEntity owner) {
+            super(owner);
+        }
+
+        @Override
+        protected Optional<CremationRecipe> findRecipe() {
+            if (this.inventory.world == null) {
+                return null;
+            }
+            return this.inventory.world.getRecipeManager() //
+                    .getFirstMatch(CremationRecipe.TYPE, this.inventory, this.inventory.world) //
+                    .map(RecipeEntry::value);
+        }
+
+        @Override
+        public boolean canCraft(CremationRecipe recipe) {
+            ItemStack result = recipe.getResult(this.inventory.world.getRegistryManager());
+            return this.inventory.canFullyAddStack(OUTPUT_SLOT, result) //
+                    && FluidTransferUtils.canFullyInsert(recipe.getFluid(), this.inventory.tank);
+        }
+
+        @Override
+        protected void craftRecipe(CremationRecipe recipe) {
+            float experience = recipe.getExperience(this.inventory);
+            this.inventory.addExperienceToAlembicOrDrop(experience);
+
+            ItemStack result = recipe.craft(this.inventory, this.inventory.world.getRegistryManager());
+            this.inventory.addStack(OUTPUT_SLOT, result);
+
+            if (recipe.getFluid() != null) {
+                try (Transaction transaction = Transaction.openOuter()) {
+                    this.inventory.tank.insert(recipe.getFluid().resource(), recipe.getFluid().amount(), transaction);
+                    transaction.commit();
+                }
+            }
+            ItemStack input = this.inventory.getStack(INPUT_SLOT);
+            input.decrement(recipe.getInputCount());
+            this.inventory.setStack(INPUT_SLOT, input); // updates cached recipe
+        }
+
+        @Override
+        protected int getRecipeDuration(CremationRecipe recipe) {
+            return recipe.getDuration();
+        }
+    }
+
     protected void addExperienceToAlembicOrDrop(float experience) {
         if (this.world.getBlockEntity(this.pos.up()) instanceof AlembicBlockEntity alembic //
                 && (alembic.tank.variant.isBlank() || alembic.tank.variant.getFluid() == ExperienceFluid.INSTANCE)) {
@@ -216,19 +214,36 @@ public class CrematoriumBlockEntity extends MagifactureBlockEntity implements Si
         }
     }
 
-    public int getRecipeProgress() {
-        return this.recipeHandler.getRecipeProgress();
-    }
+    private static class CrematoriumFuelHandler extends FuelHandler<CrematoriumBlockEntity> {
+        public CrematoriumFuelHandler(CrematoriumBlockEntity inventory) {
+            super(inventory, CrematoriumBlockEntity.FUEL_SLOT);
+        }
 
-    public int getRecipeDuration() {
-        return this.recipeHandler.getRecipeDuration();
-    }
+        @Override
+        protected boolean canStartBurning() {
+            return this.inventory.recipeHandler.canCraft();
+        }
 
-    public int getFuelLeft() {
-        return this.fuelHandler.getFuelLeft();
-    }
+        @Override
+        protected void onBurningStarted() {
+            this.inventory.world.setBlockState(this.inventory.pos, //
+                    this.inventory.getCachedState().with(Properties.LIT, true));
+        }
 
-    public int getFuelDuration() {
-        return this.fuelHandler.getFuelDuration();
+        @Override
+        protected void onBurningTick() {
+            this.inventory.recipeHandler.progress();
+        }
+
+        @Override
+        protected void onBurningEnded() {
+            this.inventory.world.setBlockState(this.inventory.pos, //
+                    this.inventory.getCachedState().with(Properties.LIT, false));
+        }
+
+        @Override
+        protected void onNonBurningTick() {
+            this.inventory.recipeHandler.regress();
+        }
     }
 }

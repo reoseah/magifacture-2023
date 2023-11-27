@@ -61,7 +61,7 @@ public class InfuserScreenHandler extends MagifactureScreenHandler {
     }
 
     public InfuserScreenHandler(int syncId, PlayerInventory playerInv) {
-        this(syncId, new SimpleInventory(InfuserBlockEntity.INVENTORY_SIZE), SingleFluidStorage.withFixedCapacity(InfuserBlockEntity.CAPACITY_MB * 81, () -> {
+        this(syncId, new SimpleInventory(InfuserBlockEntity.INVENTORY_SIZE), SingleFluidStorage.withFixedCapacity(InfuserBlockEntity.FLUID_CAPACITY, () -> {
         }), playerInv, new ArrayPropertyDelegate(2));
     }
 }

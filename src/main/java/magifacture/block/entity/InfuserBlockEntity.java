@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class InfuserBlockEntity extends MagifactureBlockEntity implements SidedInventory {
-    public static final int CAPACITY_MB = 4000;
+    public static final int FLUID_CAPACITY = 4000 * 81;
 
     public static final int[] INPUT_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     public static final int SLOT_OUTPUT = 9, SLOT_FULL = 10, SLOT_DRAINED = 11;
@@ -38,51 +38,12 @@ public class InfuserBlockEntity extends MagifactureBlockEntity implements SidedI
 
     public static final BlockEntityType<InfuserBlockEntity> TYPE = FabricBlockEntityTypeBuilder.create(InfuserBlockEntity::new, InfuserBlock.INSTANCE).build();
 
-    public final RecipeHandler<InfusionRecipe> recipeHandler = new RecipeHandler<>(this) {
-        @SuppressWarnings("OptionalAssignedToNull")
-        @Override
-        protected Optional<InfusionRecipe> findRecipe() {
-            if (world == null) {
-                return null;
-            }
-            return world.getRecipeManager() //
-                    .getFirstMatch(InfusionRecipe.TYPE, InfuserBlockEntity.this, world) //
-                    .map(RecipeEntry::value);
-        }
-
-        @Override
-        public boolean canCraft(InfusionRecipe recipe) {
-            return recipe.matches(InfuserBlockEntity.this, world) //
-                    && canFullyAddStack(SLOT_OUTPUT, recipe.craft(InfuserBlockEntity.this, world.getRegistryManager()));
-
-        }
-
-        @Override
-        protected void craftRecipe(InfusionRecipe recipe) {
-            addStack(SLOT_OUTPUT, recipe.craft(InfuserBlockEntity.this, getWorld().getRegistryManager()));
-            tank.amount -= recipe.getFluidCost(InfuserBlockEntity.this).amount();
-
-            if (tank.amount == 0) {
-                tank.variant = FluidVariant.blank();
-            }
-            for (int i = 0; i < 9; i++) {
-                if (!getStack(i).isEmpty()) {
-                    getStack(i).decrement(1);
-                }
-            }
-        }
-
-        @Override
-        protected int getRecipeDuration(InfusionRecipe recipe) {
-            return recipe.getDuration(InfuserBlockEntity.this);
-        }
-    };
-
     @Getter
-    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(CAPACITY_MB * 81, () -> {
+    protected final SingleFluidStorage tank = SingleFluidStorage.withFixedCapacity(FLUID_CAPACITY, () -> {
         this.markDirty();
         this.recipeHandler.resetCachedRecipe();
     });
+    public final RecipeHandler<InfusionRecipe, InfuserBlockEntity> recipeHandler = new InfuserRecipeHandler(this);
 
     public InfuserBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
@@ -91,16 +52,6 @@ public class InfuserBlockEntity extends MagifactureBlockEntity implements SidedI
     @Override
     protected DefaultedList<ItemStack> createSlotsList() {
         return DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
-    }
-
-    @Override
-    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-        return new InfuserScreenHandler(syncId, this, playerInventory);
-    }
-
-    public static void tickServer(World world, BlockPos pos, BlockState state, InfuserBlockEntity be) {
-        FluidTransferUtils.tryDrainItem(be.tank, be, SLOT_FULL, SLOT_DRAINED, CAPACITY_MB - be.tank.getAmount());
-        be.recipeHandler.tickRecipe(1);
     }
 
     @Override
@@ -115,6 +66,17 @@ public class InfuserBlockEntity extends MagifactureBlockEntity implements SidedI
         super.writeNbt(nbt);
         this.tank.writeNbt(nbt);
         this.recipeHandler.writeNbt(nbt);
+    }
+
+    @Override
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return new InfuserScreenHandler(syncId, this, playerInventory);
+    }
+
+    @SuppressWarnings("unused")
+    public static void tickServer(World world, BlockPos pos, BlockState state, InfuserBlockEntity be) {
+        FluidTransferUtils.tryDrainItem(be.tank, be, SLOT_FULL, SLOT_DRAINED, FLUID_CAPACITY - be.tank.getAmount());
+        be.recipeHandler.progress();
     }
 
     @Override
@@ -154,5 +116,48 @@ public class InfuserBlockEntity extends MagifactureBlockEntity implements SidedI
 
     public int getRecipeDuration() {
         return this.recipeHandler.getRecipeDuration();
+    }
+
+    protected static class InfuserRecipeHandler extends RecipeHandler<InfusionRecipe, InfuserBlockEntity> {
+        public InfuserRecipeHandler(InfuserBlockEntity inventory) {
+            super(inventory);
+        }
+
+        @SuppressWarnings("OptionalAssignedToNull")
+        @Override
+        protected Optional<InfusionRecipe> findRecipe() {
+            if (this.inventory.world == null) {
+                return null;
+            }
+            return this.inventory.world.getRecipeManager() //
+                    .getFirstMatch(InfusionRecipe.TYPE, this.inventory, this.inventory.world) //
+                    .map(RecipeEntry::value);
+        }
+
+        @Override
+        public boolean canCraft(InfusionRecipe recipe) {
+            return recipe.matches(this.inventory, this.inventory.world) //
+                    && this.inventory.canFullyAddStack(SLOT_OUTPUT, recipe.craft(this.inventory, this.inventory.world.getRegistryManager()));
+        }
+
+        @Override
+        protected void craftRecipe(InfusionRecipe recipe) {
+            this.inventory.addStack(SLOT_OUTPUT, recipe.craft(this.inventory, this.inventory.getWorld().getRegistryManager()));
+            this.inventory.tank.amount -= recipe.getFluidCost(this.inventory).amount();
+
+            if (this.inventory.tank.amount == 0) {
+                this.inventory.tank.variant = FluidVariant.blank();
+            }
+            for (int i = 0; i < 9; i++) {
+                if (!this.inventory.getStack(i).isEmpty()) {
+                    this.inventory.getStack(i).decrement(1);
+                }
+            }
+        }
+
+        @Override
+        protected int getRecipeDuration(InfusionRecipe recipe) {
+            return recipe.getDuration(this.inventory);
+        }
     }
 }

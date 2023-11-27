@@ -16,7 +16,7 @@ import java.util.Optional;
  * <pre>
  *     &#64;Override
  *     public void setStack(int slot, ItemStack stack) {
- *         if (slot < this.getInputsCount()) {
+ *         if (slot < INPUTS_COUNT) {
  *             ItemStack previous = this.slots.get(slot);
  *             boolean needsRecipeUpdate = stack.isEmpty() || !ItemStack.canCombine(previous, stack);
  *
@@ -29,14 +29,18 @@ import java.util.Optional;
  * </pre>
  */
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull", "UnstableApiUsage"})
-public abstract class RecipeHandler<R extends Recipe<?>> {
-    protected final Inventory inventory;
+public abstract class RecipeHandler<R extends Recipe<?>, I extends Inventory> {
+    protected final I inventory;
+    /**
+     * Cached recipe, or null if no recipe is cached.
+     * If the optional is empty, it means there is no matching recipe.
+     */
     protected @Nullable Optional<R> cachedRecipe = null;
 
     @Getter
     protected int recipeProgress;
 
-    protected RecipeHandler(Inventory inventory) {
+    protected RecipeHandler(I inventory) {
         this.inventory = inventory;
     }
 
@@ -48,19 +52,13 @@ public abstract class RecipeHandler<R extends Recipe<?>> {
         tag.putInt("RecipeProgress", this.recipeProgress);
     }
 
-    /**
-     * Search a matching recipe. Return will be cached until a change in inputs.
-     */
     protected abstract @Nullable Optional<R> findRecipe();
 
-    public abstract boolean canCraft(R recipe);
+    protected abstract boolean canCraft(R recipe);
 
     protected abstract void craftRecipe(R recipe);
 
     protected abstract int getRecipeDuration(R recipe);
-
-    protected void onRecipeTick(R recipe, int amount) {
-    }
 
     public void resetCachedRecipe() {
         this.cachedRecipe = null;
@@ -86,24 +84,23 @@ public abstract class RecipeHandler<R extends Recipe<?>> {
         return recipe != null && this.canCraft(recipe);
     }
 
-    public void tickRecipe(int progress) {
+    public void progress() {
         boolean shouldMarkDirty = false;
 
         R recipe = this.getRecipe();
 
         if (recipe != null && this.canCraft(recipe)) {
+            int progress = this.getAmountToProgress();
             if (progress > 0) {
-                int change = Math.min(progress, this.getRecipeDuration(recipe) - this.recipeProgress);
+                int amount = Math.min(progress, this.getRecipeDuration(recipe) - this.recipeProgress);
 
-                this.recipeProgress += change;
-                this.onRecipeTick(recipe, change);
+                this.recipeProgress += amount;
+                this.onRecipeProgress(recipe, amount);
 
                 if (this.recipeProgress >= this.getRecipeDuration(recipe)) {
                     this.craftRecipe(recipe);
                     this.recipeProgress = 0;
                 }
-            } else {
-                this.recipeProgress = Math.max(this.recipeProgress + progress, 0);
             }
             shouldMarkDirty = true;
         } else if (this.recipeProgress > 0) {
@@ -114,5 +111,31 @@ public abstract class RecipeHandler<R extends Recipe<?>> {
         if (shouldMarkDirty) {
             this.inventory.markDirty();
         }
+    }
+
+    protected int getAmountToProgress() {
+        return 1;
+    }
+
+    protected void onRecipeProgress(R recipe, int amount) {
+    }
+
+    public void regress() {
+        R recipe = this.getRecipe();
+
+        if (recipe != null && this.canCraft(recipe)) {
+            if (this.recipeProgress > 0) {
+                int amount = Math.min(this.recipeProgress, this.getAmountToRegress());
+                this.recipeProgress -= amount;
+                this.onRecipeRegress(recipe, amount);
+            }
+        }
+    }
+
+    protected int getAmountToRegress() {
+        return -2;
+    }
+
+    protected void onRecipeRegress(R recipe, int amount) {
     }
 }

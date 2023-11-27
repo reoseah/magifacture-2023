@@ -1,5 +1,6 @@
 package magifacture.block;
 
+import magifacture.block.entity.CrematoriumBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -25,7 +26,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import magifacture.block.entity.CrematoriumBlockEntity;
 
 public class CrematoriumBlock extends MagifactureBlock {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;

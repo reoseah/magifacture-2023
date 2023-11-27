@@ -8,15 +8,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 
-public abstract class FuelHandler {
-    protected final Inventory inventory;
+public abstract class FuelHandler<I extends Inventory> {
+    protected final I inventory;
     protected final int fuelSlot;
     @Getter
     protected int fuelLeft;
     @Getter
     protected int fuelDuration;
 
-    public FuelHandler(Inventory inventory, int fuelSlot) {
+    public FuelHandler(I inventory, int fuelSlot) {
         this.inventory = inventory;
         this.fuelSlot = fuelSlot;
     }
@@ -29,10 +29,6 @@ public abstract class FuelHandler {
     public void writeNbt(NbtCompound nbt) {
         nbt.putShort("FuelLeft", (short) this.fuelLeft);
         nbt.putShort("FuelDuration", (short) this.fuelDuration);
-    }
-
-    protected boolean disallowUsingLava() {
-        return false;
     }
 
     public boolean canConsumeFuel() {
@@ -62,6 +58,10 @@ public abstract class FuelHandler {
 
         this.fuelDuration = this.fuelLeft = fuelValue;
         return true;
+    }
+
+    protected boolean disallowUsingLava() {
+        return false;
     }
 
     public void tick() {
