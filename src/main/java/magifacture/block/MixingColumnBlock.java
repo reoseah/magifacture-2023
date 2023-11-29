@@ -1,6 +1,7 @@
 package magifacture.block;
 
 import magifacture.block.entity.MixingColumnBlockEntity;
+import magifacture.block.entity.MixingColumnExtensionBlockEntity;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -58,10 +59,43 @@ public class MixingColumnBlock extends MagifactureBlock {
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
+    @Override
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        updateBlockEntity(state, world, pos);
+        super.onBlockAdded(state, world, pos, oldState, notify);
+    }
+
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        updateBlockEntity(state, world, pos);
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+        if (pos.getX() == sourcePos.getX() && pos.getZ() == sourcePos.getZ() //
+                && sourceBlock == this) {
+            updateBlockEntity(state, world, pos);
+        }
+    }
+
+    private static void updateBlockEntity(BlockState state, World world, BlockPos pos) {
+        if (state.getBlock() == state.getBlock()) {
+            if (world.getBlockEntity(pos) instanceof MixingColumnBlockEntity main) {
+                main.onStateChange(state);
+            } else if (world.getBlockEntity(pos) instanceof MixingColumnExtensionBlockEntity extension) {
+                extension.onStateChange(state);
+            }
+        }
+    }
+
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return !state.get(DOWN) ? new MixingColumnBlockEntity(pos, state) : null;
+        return !state.get(DOWN) //
+                ? new MixingColumnBlockEntity(pos, state) //
+                : new MixingColumnExtensionBlockEntity(pos, state);
     }
 
     @Nullable

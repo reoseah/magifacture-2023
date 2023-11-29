@@ -42,7 +42,7 @@ public class MultipleFluidDrawable implements Drawable {
             long amount = entry.getLongValue();
 
             if (!variant.isBlank()) {
-                int height = MathHelper.clamp(Math.round(amount * (float) this.height / this.storage.getCapacity()), 1, this.height);
+                int height = MathHelper.clamp(Math.round(amount * (float) this.height / this.storage.getCapacity()), 1, this.height - total);
                 int y = this.screen.getY() + this.y + MathHelper.clamp(this.height - height - total, 0, this.height - total);
 
                 FluidRendering.drawFluidColumn(context, variant, //
@@ -88,7 +88,7 @@ public class MultipleFluidDrawable implements Drawable {
             }
             if (mouseY < screen.getY() + this.y + this.height - totalHeight) {
                 long capacity = storage.getCapacity();
-                List<Text> tooltip = FluidTexts.getTooltip(Fluids.EMPTY, capacity - totalAmount, capacity);
+                List<Text> tooltip = FluidTexts.getTooltip(Fluids.EMPTY, 0, capacity);
                 context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
             }
         }

@@ -63,6 +63,10 @@ public class FluidTexts {
         return Text.translatable("magifacture.amount_and_capacity", formatAmount(amount), formatAmount(capacity));
     }
 
+    public static List<Text> getTooltip(Fluid fluid, long amount) {
+        return Arrays.asList(getName(fluid), formatAmount(amount).formatted(Formatting.GRAY));
+    }
+
     public static List<Text> getTooltip(Fluid fluid, long amount, long capacity) {
         return Arrays.asList(getName(fluid), formatAmountAndCapacity(amount, capacity).formatted(Formatting.GRAY));
     }

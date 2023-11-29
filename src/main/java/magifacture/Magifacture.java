@@ -1,10 +1,7 @@
 package magifacture;
 
 import magifacture.block.*;
-import magifacture.block.entity.AlembicBlockEntity;
-import magifacture.block.entity.CrematoriumBlockEntity;
-import magifacture.block.entity.InfuserBlockEntity;
-import magifacture.block.entity.MixingColumnBlockEntity;
+import magifacture.block.entity.*;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.fluid.MoltenGoldFluid;
 import magifacture.item.ExperienceBucketItem;
@@ -72,6 +69,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:crematorium", CrematoriumBlockEntity.TYPE);
         Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:infuser", InfuserBlockEntity.TYPE);
         Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:mixing_column", MixingColumnBlockEntity.TYPE);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, "magifacture:mixing_column_extension", MixingColumnExtensionBlockEntity.TYPE);
 
         FluidStorage.SIDED.registerForBlockEntity((be, side) -> side != Direction.UP ? be.getTank() : null, AlembicBlockEntity.TYPE);
         FluidStorage.SIDED.registerForBlockEntity((be, side) -> side != Direction.UP ? be.getTank() : null, CrematoriumBlockEntity.TYPE);

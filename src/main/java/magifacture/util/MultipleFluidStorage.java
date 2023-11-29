@@ -16,18 +16,25 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
-public class MultipleFluidStorage //
+public abstract class MultipleFluidStorage //
         extends SnapshotParticipant<Object2LongMap<FluidVariant>> //
         implements Storage<FluidVariant> {
     @Getter
     protected Object2LongMap<FluidVariant> fluids;
-    @Setter
-    @Getter
-    private long capacity;
 
-    public MultipleFluidStorage(long capacity) {
-        this.capacity = capacity;
-        fluids = new Object2LongLinkedOpenHashMap<>();
+    public MultipleFluidStorage() {
+        this.fluids = new Object2LongLinkedOpenHashMap<>();
+    }
+
+    public abstract long getCapacity();
+
+    public static MultipleFluidStorage withFixedCapacity(long capacity) {
+        return new MultipleFluidStorage() {
+            @Override
+            public long getCapacity() {
+                return capacity;
+            }
+        };
     }
 
     @Override
@@ -47,7 +54,7 @@ public class MultipleFluidStorage //
         }
 
         long total = this.fluids.values().longStream().sum();
-        long inserted = Math.min(maxAmount, this.capacity - total);
+        long inserted = Math.min(maxAmount, this.getCapacity() - total);
         if (inserted <= 0) {
             return 0;
         }
@@ -115,7 +122,7 @@ public class MultipleFluidStorage //
 
                     @Override
                     public long getCapacity() {
-                        return MultipleFluidStorage.this.capacity;
+                        return MultipleFluidStorage.this.getCapacity();
                     }
                 }).iterator();
     }
@@ -144,5 +151,31 @@ public class MultipleFluidStorage //
             fluids.add(fluid);
         }
         nbt.put("fluids", fluids);
+    }
+
+    public static MultipleFluidStorage.WithMutableCapacity withMutableCapacity(long initialCapacity) {
+        return new WithMutableCapacity(initialCapacity);
+    }
+
+    public static class WithMutableCapacity extends MultipleFluidStorage {
+        @Getter
+        @Setter
+        private long capacity;
+
+        public WithMutableCapacity(long initialCapacity) {
+            this.capacity = initialCapacity;
+        }
+
+        @Override
+        public void readNbt(NbtCompound nbt) {
+            super.readNbt(nbt);
+            this.capacity = nbt.getLong("Capacity");
+        }
+
+        @Override
+        public void writeNbt(NbtCompound nbt) {
+            super.writeNbt(nbt);
+            nbt.putLong("Capacity", this.capacity);
+        }
     }
 }

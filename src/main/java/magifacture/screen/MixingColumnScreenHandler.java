@@ -32,18 +32,21 @@ public class MixingColumnScreenHandler extends MagifactureScreenHandler {
 
         this.addPlayerSlots(playerInv);
 
-        this.addNbtSlot(this.storage::readNbt, this.storage::writeNbt);
     }
 
     public MixingColumnScreenHandler(int syncId, MixingColumnBlockEntity be, PlayerInventory playerInv) {
         this(syncId, be, be.getFluidStorage(), playerInv);
+
+        this.addNbtSlot(this.storage::readNbt, be.getFluidStorage()::writeNbtWithCapacity);
     }
 
     public MixingColumnScreenHandler(int syncId, PlayerInventory playerInv) {
         this(syncId, //
                 new SimpleInventory(MixingColumnBlockEntity.INVENTORY_SIZE), //
-                new MultipleFluidStorage(4000 * 81), //
+                MultipleFluidStorage.withMutableCapacity(4000 * 81), //
                 playerInv);
+
+        this.addNbtSlot(this.storage::readNbt, this.storage::writeNbt);
     }
 
     @Override

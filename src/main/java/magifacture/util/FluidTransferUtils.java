@@ -47,6 +47,9 @@ public class FluidTransferUtils {
         var ctx = ContainerItemContext.withConstant(stack);
         var storage = ctx.find(FluidStorage.ITEM);
         if (storage != null) {
+            if (fluid == null || fluid.isBlank()) {
+                return storage.supportsInsertion();
+            }
             return StorageUtil.simulateInsert(storage, fluid, Integer.MAX_VALUE, null) > 0;
         }
         return false;
@@ -148,7 +151,9 @@ public class FluidTransferUtils {
             return 0;
         }
         try (Transaction transaction = Transaction.openOuter()) {
-            return storage.insert(fluid.resource(), fluid.amount(), transaction);
+            long change = storage.insert(fluid.resource(), fluid.amount(), transaction);
+            transaction.commit();
+            return change;
         }
     }
 }
