@@ -10,14 +10,17 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class MixingColumnBlockEntity extends MagifactureBlockEntity {
+public class MixingColumnBlockEntity extends MagifactureBlockEntity implements SidedInventory {
     public static final int INVENTORY_SIZE = 6;
     public static final int SLOT_INPUT = 0, //
             SLOT_OUTPUT = 1, //
@@ -66,7 +69,6 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity {
         FluidTransferUtils.tryFillItem(be.fluidStorage, be, SLOT_TO_FILL, SLOT_FILLED, Integer.MAX_VALUE);
     }
 
-
     @Override
     public boolean canPlayerUse(PlayerEntity player) {
         for (int i = 0; i < this.extensions; i++) {
@@ -96,8 +98,33 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity {
         }
     }
 
+    @Override
+    public int[] getAvailableSlots(Direction side) {
+        return switch (side) {
+            case UP -> new int[]{SLOT_INPUT};
+            case DOWN -> new int[]{SLOT_OUTPUT, SLOT_DRAINED, SLOT_FILLED};
+            default -> new int[]{SLOT_TO_DRAIN, SLOT_TO_FILL, SLOT_DRAINED, SLOT_FILLED};
+        };
+    }
+
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        return switch (slot) {
+            case SLOT_INPUT -> true;
+            case SLOT_TO_DRAIN -> FluidTransferUtils.canDrain(stack);
+            case SLOT_TO_FILL -> FluidTransferUtils.canFill(stack);
+            default -> false;
+        };
+    }
+
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return true;
+    }
+
     public static class MixingColumnFluidStorage extends MultipleFluidStorage {
         protected final MixingColumnBlockEntity be;
+
         public MixingColumnFluidStorage(MixingColumnBlockEntity be) {
             super();
             this.be = be;
