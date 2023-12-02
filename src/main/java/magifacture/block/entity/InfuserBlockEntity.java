@@ -80,6 +80,19 @@ public class InfuserBlockEntity extends MagifactureBlockEntity implements SidedI
     }
 
     @Override
+    public void setStack(int slot, ItemStack stack) {
+        if (slot < 9) {
+            ItemStack previous = this.slots.get(slot);
+            boolean needsRecipeUpdate = stack.isEmpty() || !ItemStack.canCombine(previous, stack);
+
+            if (needsRecipeUpdate) {
+                this.recipeHandler.resetCachedRecipe();
+            }
+        }
+        this.slots.set(slot, stack);
+    }
+
+    @Override
     public int[] getAvailableSlots(Direction side) {
         return switch (side) {
             case UP -> {
