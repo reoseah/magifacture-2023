@@ -40,6 +40,19 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity implements S
         super(TYPE, pos, state);
     }
 
+    public static MixingColumnBlockEntity from(MixingColumnExtensionBlockEntity extension) {
+        MixingColumnBlockEntity be = new MixingColumnBlockEntity(extension.getPos(), extension.getCachedState());
+        return be;
+    }
+
+    public void resetExtensions() {
+        this.extensions = 0;
+    }
+
+    public void addExtension(MixingColumnExtensionBlockEntity extension) {
+        this.extensions++;
+    }
+
     @Override
     public void readNbt(NbtCompound tag) {
         super.readNbt(tag);
@@ -73,29 +86,11 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity implements S
     public boolean canPlayerUse(PlayerEntity player) {
         for (int i = 0; i < this.extensions; i++) {
             BlockPos pos = this.pos.up(i);
-            if (player.squaredDistanceTo(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) > 64) {
-                return false;
+            if (player.squaredDistanceTo(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < 64) {
+                return true;
             }
         }
         return super.canPlayerUse(player);
-    }
-
-    public void onStateChange(BlockState newState) {
-        if (newState.get(MixingColumnBlock.DOWN)) {
-            this.world.removeBlockEntity(this.pos);
-            MixingColumnExtensionBlockEntity newBe = new MixingColumnExtensionBlockEntity(this.pos, this.world.getBlockState(this.pos));
-            this.world.addBlockEntity(newBe);
-            newBe.onStateChange(newState);
-        } else if (newState.get(MixingColumnBlock.UP)) {
-            this.extensions = 0;
-            for (BlockPos pos = this.pos.mutableCopy(); pos.getY() < this.pos.getY() + 6; pos = pos.up()) {
-                BlockState state = this.world.getBlockState(pos);
-                if (state.isOf(MixingColumnBlock.INSTANCE)) {
-                    this.extensions++;
-                    return;
-                }
-            }
-        }
     }
 
     @Override
@@ -146,4 +141,6 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity implements S
             nbt.putLong("Capacity", this.getCapacity());
         }
     }
+
+
 }

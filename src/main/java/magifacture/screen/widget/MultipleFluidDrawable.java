@@ -88,7 +88,7 @@ public class MultipleFluidDrawable implements Drawable {
             }
             if (mouseY < screen.getY() + this.y + this.height - totalHeight) {
                 long capacity = storage.getCapacity();
-                List<Text> tooltip = FluidTexts.getTooltip(Fluids.EMPTY, 0, capacity);
+                List<Text> tooltip = FluidTexts.getTooltip(Fluids.EMPTY, capacity - totalAmount, capacity);
                 context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
             }
         }

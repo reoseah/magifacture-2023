@@ -61,31 +61,55 @@ public class MixingColumnBlock extends MagifactureBlock {
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        updateBlockEntity(state, world, pos);
+        updateBlockEntities(state, world, pos);
         super.onBlockAdded(state, world, pos, oldState, notify);
     }
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        updateBlockEntity(state, world, pos);
+        updateBlockEntities(state, world, pos);
         super.onStateReplaced(state, world, pos, newState, moved);
     }
+//
+//    @Override
+//    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+//        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+//        if (pos.getX() == sourcePos.getX() && pos.getZ() == sourcePos.getZ() //
+//                && sourceBlock == this) {
+//            updateBlockEntity(state, world, pos);
+//        }
+//    }
 
-    @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
-        if (pos.getX() == sourcePos.getX() && pos.getZ() == sourcePos.getZ() //
-                && sourceBlock == this) {
-            updateBlockEntity(state, world, pos);
+    private static void updateBlockEntities(BlockState state, World world, BlockPos pos) {
+        BlockPos lowest = pos;
+        while (world.getBlockState(lowest.down()).isOf(MixingColumnBlock.INSTANCE)) {
+            lowest = lowest.down();
         }
-    }
+        MixingColumnBlockEntity main = null;
+        BlockEntity be = world.getBlockEntity(lowest);
+        if (be instanceof MixingColumnBlockEntity oldMain) {
+            main = oldMain;
+        } else if (be instanceof MixingColumnExtensionBlockEntity invalidExtension) {
+            MixingColumnBlockEntity newMain = MixingColumnBlockEntity.from(invalidExtension);
+            world.removeBlockEntity(lowest);
+            world.addBlockEntity(newMain);
+            main = newMain;
+        }
 
-    private static void updateBlockEntity(BlockState state, World world, BlockPos pos) {
-        if (state.getBlock() == state.getBlock()) {
-            if (world.getBlockEntity(pos) instanceof MixingColumnBlockEntity main) {
-                main.onStateChange(state);
-            } else if (world.getBlockEntity(pos) instanceof MixingColumnExtensionBlockEntity extension) {
-                extension.onStateChange(state);
+        main.resetExtensions();
+        BlockPos above = lowest;
+        while (world.getBlockState(above.up()).isOf(MixingColumnBlock.INSTANCE)) {
+            above = above.up();
+            BlockEntity be2 = world.getBlockEntity(above);
+            if (be2 instanceof MixingColumnExtensionBlockEntity extension) {
+                main.addExtension(extension);
+                extension.setMainPos(lowest);
+            } else if (be2 instanceof MixingColumnBlockEntity invalidMain) {
+                MixingColumnExtensionBlockEntity extension = MixingColumnExtensionBlockEntity.from(invalidMain, main);
+                world.removeBlockEntity(above);
+                world.addBlockEntity(extension);
+                main.addExtension(extension);
+                extension.setMainPos(lowest);
             }
         }
     }
