@@ -20,10 +20,9 @@ public abstract class MultipleFluidStorage //
         extends SnapshotParticipant<Object2LongMap<FluidVariant>> //
         implements Storage<FluidVariant> {
     @Getter
-    protected Object2LongMap<FluidVariant> fluids;
+    protected Object2LongMap<FluidVariant> fluids = new Object2LongLinkedOpenHashMap<>();
 
     public MultipleFluidStorage() {
-        this.fluids = new Object2LongLinkedOpenHashMap<>();
     }
 
     public abstract long getCapacity();

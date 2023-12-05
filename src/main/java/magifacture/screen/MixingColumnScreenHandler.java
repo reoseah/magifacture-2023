@@ -1,9 +1,13 @@
 package magifacture.screen;
 
+import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import magifacture.block.entity.MixingColumnBlockEntity;
 import magifacture.screen.slot.SimpleOutputSlot;
 import magifacture.util.FluidTransferUtils;
 import magifacture.util.MultipleFluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -31,7 +35,6 @@ public class MixingColumnScreenHandler extends MagifactureScreenHandler {
         this.addSlot(new SimpleOutputSlot(this.inventory, MixingColumnBlockEntity.SLOT_FILLED, 151, 53));
 
         this.addPlayerSlots(playerInv);
-
     }
 
     public MixingColumnScreenHandler(int syncId, MixingColumnBlockEntity be, PlayerInventory playerInv) {
@@ -59,5 +62,26 @@ public class MixingColumnScreenHandler extends MagifactureScreenHandler {
             }
         }
         return super.getPreferredQuickMoveSlot(stack, world, slot);
+    }
+
+    @Override
+    public boolean onButtonClick(PlayerEntity player, int id) {
+        Object2LongMap<FluidVariant> fluids = this.storage.getFluids();
+        if (id != 0 && id < fluids.size()) {
+            FluidVariant fluid = fluids.keySet().stream().skip(id).findFirst().orElse(FluidVariant.blank());
+            long amount = fluids.getLong(fluid);
+
+            Object2LongMap<FluidVariant> copy = new Object2LongLinkedOpenHashMap<>(fluids);
+            copy.remove(fluid, amount);
+
+            fluids.clear();
+            fluids.put(fluid, amount);
+            fluids.putAll(copy);
+
+            this.inventory.markDirty();
+
+            return true;
+        }
+        return super.onButtonClick(player, id);
     }
 }

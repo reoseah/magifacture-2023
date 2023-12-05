@@ -141,6 +141,4 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity implements S
             nbt.putLong("Capacity", this.getCapacity());
         }
     }
-
-
 }

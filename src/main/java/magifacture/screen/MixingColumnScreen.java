@@ -13,7 +13,9 @@ public class MixingColumnScreen extends MagifactureScreen<MixingColumnScreenHand
     public MixingColumnScreen(MixingColumnScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
 
-        this.addTankRender(handler.storage, 72, 18, 32, 50);
+        this.addTankRender(handler.storage, 72, 18, 32, 50, (fluid, idx) -> {
+            this.client.interactionManager.clickButton(this.getScreenHandler().syncId, idx);
+        });
     }
 
     @Override

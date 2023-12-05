@@ -6,13 +6,18 @@ import magifacture.screen.widget.SimpleFluidDrawable;
 import magifacture.util.MultipleFluidStorage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.util.List;
+import java.util.function.ObjIntConsumer;
 
 @Environment(EnvType.CLIENT)
 public abstract class MagifactureScreen<T extends MagifactureScreenHandler> extends HandledScreen<T> {
@@ -28,9 +33,10 @@ public abstract class MagifactureScreen<T extends MagifactureScreenHandler> exte
         return widget;
     }
 
-    protected MultipleFluidDrawable addTankRender(MultipleFluidStorage tank, int x, int y, int width, int height) {
-        MultipleFluidDrawable widget = new MultipleFluidDrawable(this, tank, x, y, width, height);
+    protected MultipleFluidDrawable addTankRender(MultipleFluidStorage tank, int x, int y, int width, int height, ObjIntConsumer<FluidVariant> onClick) {
+        MultipleFluidDrawable widget = new MultipleFluidDrawable(this, tank, x, y, width, height, onClick);
         this.addDrawable(widget);
+        ((List<Element>) this.children()).add(widget);
         return widget;
     }
 
