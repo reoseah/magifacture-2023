@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.*;
 
-public abstract class MoltenMetalFluid extends FlowableFluid {
+public abstract class MoltenSubstanceFluid extends FlowableFluid {
     @Override
     public boolean matchesType(Fluid fluid) {
         return fluid == this.getStill() || fluid == this.getFlowing();

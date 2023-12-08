@@ -10,13 +10,7 @@
   ],
   "duration": 400,
   "result": {
-	"item": "magifacture:ash"
-  },
-  "fluid": {
-	"variant": {
-	  "fluid": "magifacture:molten_gold"
-	},
-	"amount": 18000
+	"item": "minecraft:gold_ingot"
   },
   "experience": 0
 }

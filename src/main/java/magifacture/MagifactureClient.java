@@ -1,7 +1,6 @@
 package magifacture;
 
 import magifacture.fluid.ExperienceFluid;
-import magifacture.fluid.MoltenGoldFluid;
 import magifacture.fluid.MoltenMagicCrystalFluid;
 import magifacture.screen.*;
 import net.fabricmc.api.ClientModInitializer;
@@ -18,9 +17,8 @@ public class MagifactureClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         setupFluidTextures(ExperienceFluid.INSTANCE, "experience");
-        setupFluidTextures(MoltenMagicCrystalFluid.INSTANCE, "molten_magic_crystal");
-        setupFluidTextures(MoltenGoldFluid.Still.INSTANCE, "molten_gold");
-        setupFluidTextures(MoltenGoldFluid.Flowing.INSTANCE, "molten_gold");
+        setupFluidTextures(MoltenMagicCrystalFluid.Still.INSTANCE, "molten_magic_crystal");
+        setupFluidTextures(MoltenMagicCrystalFluid.Flowing.INSTANCE, "molten_magic_crystal");
 
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getTranslucent(), //
                 Magifacture.INFUSED_GLASS);
