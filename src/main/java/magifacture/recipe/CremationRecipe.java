@@ -24,13 +24,13 @@ public abstract class CremationRecipe implements Recipe<Inventory> {
     public abstract @Nullable ResourceAmount<FluidVariant> getFluid();
 
     @Override
-    public boolean fits(int width, int height) {
-        return true;
+    public RecipeType<?> getType() {
+        return TYPE;
     }
 
     @Override
-    public RecipeType<?> getType() {
-        return TYPE;
+    public boolean fits(int width, int height) {
+        return true;
     }
 
     @Override

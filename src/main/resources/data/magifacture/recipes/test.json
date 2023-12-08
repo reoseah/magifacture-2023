@@ -1,0 +1,17 @@
+{
+  "type": "magifacture:cremation",
+  "ingredient": {
+	"item": "minecraft:bedrock"
+  },
+  "duration": 200,
+  "result": {
+	"item": "magifacture:ash"
+  },
+  "fluid": {
+	"variant": {
+	  "fluid": "magifacture:molten_magic_crystal"
+	},
+	"amount": 81000
+  },
+  "experience": 0
+}
