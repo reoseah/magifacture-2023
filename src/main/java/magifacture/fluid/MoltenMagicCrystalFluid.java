@@ -10,7 +10,11 @@ import net.minecraft.item.Item;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 
-public abstract class MoltenMagicCrystalFluid extends MoltenSubstanceFluid {
+public abstract class MoltenMagicCrystalFluid extends LavaLikeFluid {
+    public static final String HEAT_KEY = "Heat";
+    public static final String POWER_KEY = "Power";
+    public static final String PURITY_KEY = "Purity";
+
     @Override
     public Fluid getFlowing() {
         return MoltenMagicCrystalFluid.Flowing.INSTANCE;
