@@ -1,41 +1,18 @@
 package magifacture.util;
 
-import magifacture.mixin.FluidAccessor;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluid;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Language;
-import net.minecraft.util.Util;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FluidTexts {
-    /**
-     * Get the name of a fluid, translated if possible.
-     */
-    public static MutableText getName(Fluid fluid) {
-        // try to translate fluid.<modid>.<name>
-        // in particular, make empty fluid "Empty" instead of "Air"
-        Identifier id = Registries.FLUID.getId(fluid);
-        String key = Util.createTranslationKey("fluid", id);
-        if (Language.getInstance().hasTranslation(key)) {
-            return Text.translatable(key);
-        }
-        // try to get the name of the associated block,
-        // works for water/lava and most modded fluids
-        BlockState blockstate = ((FluidAccessor) fluid).callToBlockState(fluid.getDefaultState());
-        if (blockstate != null) {
-            return Text.translatable(blockstate.getBlock().getTranslationKey());
-        }
-        // return block.<modid>.<name> anyway
-        return Text.translatable(Util.createTranslationKey("block", id));
-    }
-
     /**
      * Return user-friendly text for a fluid amount.
      */
@@ -63,11 +40,31 @@ public class FluidTexts {
         return Text.translatable("magifacture.amount_and_capacity", formatAmount(amount), formatAmount(capacity));
     }
 
-    public static List<Text> getTooltip(Fluid fluid, long amount) {
-        return Arrays.asList(getName(fluid), formatAmount(amount).formatted(Formatting.GRAY));
+    public static List<Text> getTooltip(FluidVariant variant, long amount, TooltipContext context) {
+        List<Text> tooltip = new ArrayList<>();
+
+        tooltip.add(FluidVariantAttributes.getName(variant));
+        FluidVariantRendering.getHandlerOrDefault(variant.getFluid()).appendTooltip(variant, tooltip, TooltipContext.BASIC);
+        tooltip.add(formatAmount(amount).formatted(Formatting.GRAY));
+
+        if (context.isAdvanced()) {
+            tooltip.add(Text.literal(Registries.FLUID.getId(variant.getFluid()).toString()).formatted(Formatting.DARK_GRAY));
+        }
+
+        return tooltip;
     }
 
-    public static List<Text> getTooltip(Fluid fluid, long amount, long capacity) {
-        return Arrays.asList(getName(fluid), formatAmountAndCapacity(amount, capacity).formatted(Formatting.GRAY));
+    public static List<Text> getTooltip(FluidVariant variant, long amount, long capacity, TooltipContext context) {
+        List<Text> tooltip = new ArrayList<>();
+
+        tooltip.add(FluidVariantAttributes.getName(variant));
+        FluidVariantRendering.getHandlerOrDefault(variant.getFluid()).appendTooltip(variant, tooltip, context);
+        tooltip.add(formatAmountAndCapacity(amount, capacity).formatted(Formatting.GRAY));
+
+        if (context.isAdvanced()) {
+            tooltip.add(Text.literal(Registries.FLUID.getId(variant.getFluid()).toString()).formatted(Formatting.DARK_GRAY));
+        }
+
+        return tooltip;
     }
 }

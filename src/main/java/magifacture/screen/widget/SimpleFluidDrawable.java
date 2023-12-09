@@ -1,6 +1,6 @@
 package magifacture.screen.widget;
 
-import magifacture.screen.MagifactureScreen;
+import magifacture.screen.client.MagifactureScreen;
 import magifacture.util.FluidRendering;
 import magifacture.util.FluidTexts;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -9,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
@@ -59,7 +60,7 @@ public class SimpleFluidDrawable implements Drawable {
                 this.width, this.height);
 
         if (this.isMouseOver(mouseX, mouseY)) {
-            List<Text> tooltip = FluidTexts.getTooltip(variant.getFluid(), (int) storage.amount, (int) storage.getCapacity());
+            List<Text> tooltip = FluidTexts.getTooltip(variant, (int) storage.amount, (int) storage.getCapacity(), MinecraftClient.getInstance().options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.BASIC);
             if (!tooltip.isEmpty()) {
                 TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
                 context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);

@@ -1,5 +1,6 @@
-package magifacture.screen;
+package magifacture.screen.client;
 
+import magifacture.screen.MixingColumnScreenHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerInventory;

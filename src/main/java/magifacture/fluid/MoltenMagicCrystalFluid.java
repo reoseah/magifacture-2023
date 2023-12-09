@@ -1,19 +1,41 @@
 package magifacture.fluid;
 
-import magifacture.Magifacture;
 import magifacture.block.MoltenMagicCrystalBlock;
+import magifacture.item.MoltenMagicCrystalBucket;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRenderHandler;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import org.jetbrains.annotations.Nullable;
+
+import java.text.NumberFormat;
+import java.util.List;
 
 public abstract class MoltenMagicCrystalFluid extends LavaLikeFluid {
     public static final String HEAT_KEY = "Heat";
     public static final String POWER_KEY = "Power";
     public static final String PURITY_KEY = "Purity";
+
+    public static final String POWER_TRANSLATION_KEY = "magifacture.magic_crystal.power";
+    public static final String PURITY_TRANSLATION_KEY = "magifacture.magic_crystal.purity";
+    public static final String HEAT_TRANSLATION_KEY = "magifacture.magic_crystal.heat";
+
+    public static final NumberFormat STATS_FORMAT = NumberFormat.getInstance();
+
+    static {
+        STATS_FORMAT.setMaximumFractionDigits(2);
+    }
 
     @Override
     public Fluid getFlowing() {
@@ -27,7 +49,7 @@ public abstract class MoltenMagicCrystalFluid extends LavaLikeFluid {
 
     @Override
     public Item getBucketItem() {
-        return Magifacture.MOLTEN_MAGIC_CRYSTAL_BUCKET;
+        return MoltenMagicCrystalBucket.INSTANCE;
     }
 
     @Override
@@ -67,6 +89,29 @@ public abstract class MoltenMagicCrystalFluid extends LavaLikeFluid {
         @Override
         public boolean isStill(FluidState fluidState) {
             return true;
+        }
+    }
+
+    public static void appendTooltip(@Nullable NbtCompound nbt, List<Text> tooltip) {
+        if (nbt != null) {
+            tooltip.add(Text.translatable(POWER_TRANSLATION_KEY, STATS_FORMAT.format(nbt.getFloat(POWER_KEY))).formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable(PURITY_TRANSLATION_KEY, STATS_FORMAT.format(nbt.getFloat(PURITY_KEY))).formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable(HEAT_TRANSLATION_KEY, STATS_FORMAT.format(nbt.getFloat(HEAT_KEY))).formatted(Formatting.GRAY));
+        } else {
+            tooltip.add(Text.translatable(POWER_TRANSLATION_KEY, 0).formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable(PURITY_TRANSLATION_KEY, 0).formatted(Formatting.GRAY));
+            tooltip.add(Text.translatable(HEAT_TRANSLATION_KEY, 0).formatted(Formatting.GRAY));
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static class RenderHandler implements FluidVariantRenderHandler {
+        public static final FluidVariantRenderHandler INSTANCE = new RenderHandler();
+
+        @Override
+        public void appendTooltip(FluidVariant fluidVariant, List<Text> tooltip, TooltipContext tooltipContext) {
+            NbtCompound nbt = fluidVariant.getNbt();
+            MoltenMagicCrystalFluid.appendTooltip(nbt, tooltip);
         }
     }
 }

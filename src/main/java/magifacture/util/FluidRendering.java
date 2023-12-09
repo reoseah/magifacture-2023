@@ -2,8 +2,6 @@ package magifacture.util;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
-import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.MinecraftClient;
@@ -60,17 +58,11 @@ public class FluidRendering {
         }
     }
 
-    public static @NotNull Sprite getStillTexture(FluidVariant volume) {
-        FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(volume.getFluid());
-        if (handler != null) {
-            Sprite[] sprites = handler.getFluidSprites(null, null, volume.getFluid().getDefaultState());
-            if (sprites != null && sprites[0] != null) {
-                return sprites[0];
-            }
-        }
-        return MinecraftClient.getInstance() //
+    public static @NotNull Sprite getStillTexture(FluidVariant variant) {
+        Sprite sprite = FluidVariantRendering.getSprite(variant);
+
+        return sprite != null ? sprite : MinecraftClient.getInstance() //
                 .getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE) //
                 .apply(MissingSprite.getMissingSpriteId());
-
     }
 }

@@ -1,6 +1,7 @@
-package magifacture.screen;
+package magifacture.screen.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import magifacture.screen.MagifactureScreenHandler;
 import magifacture.screen.widget.MultipleFluidDrawable;
 import magifacture.screen.widget.SimpleFluidDrawable;
 import magifacture.util.MultipleFluidStorage;

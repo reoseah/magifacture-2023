@@ -19,5 +19,10 @@
   "magifacture.amount_and_capacity": "%s / %s",
   "magifacture.millibucket.amount": "%s mB",
   "magifacture.millibucket.less_than_1": "<1 mB",
-  "magifacture.bucket.amount": "%s B"
+  "magifacture.bucket.amount": "%s B",
+  "magifacture.magic_crystal.power": "%s%% Power",
+  "magifacture.magic_crystal.purity": "%s%% Purity",
+  "magifacture.magic_crystal.heat": "%s%% Heat",
+  "tag.item.c.experience_buckets": "Buckets of Magic Essence",
+  "tag.fluid.c.experience": "Magic Essence"
 }

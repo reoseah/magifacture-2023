@@ -1,7 +1,7 @@
 package magifacture.screen.widget;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import magifacture.screen.MagifactureScreen;
+import magifacture.screen.client.MagifactureScreen;
 import magifacture.util.FluidRendering;
 import magifacture.util.FluidTexts;
 import magifacture.util.MultipleFluidStorage;
@@ -11,6 +11,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
@@ -83,7 +84,7 @@ public class MultipleFluidDrawable implements Element, Drawable {
                     if (mouseX >= screen.getX() + this.x && mouseX < screen.getX() + this.x + this.width //
                             && mouseY >= screen.getY() + this.y + this.height - fluidHeight - totalHeight //
                             && mouseY < screen.getY() + this.y + this.height - totalHeight) {
-                        List<Text> tooltip = FluidTexts.getTooltip(variant.getFluid(), amount, (int) storage.getCapacity());
+                        List<Text> tooltip = FluidTexts.getTooltip(variant, amount, (int) storage.getCapacity(), MinecraftClient.getInstance().options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.BASIC);
                         context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
                     }
 
@@ -93,7 +94,7 @@ public class MultipleFluidDrawable implements Element, Drawable {
             }
             if (mouseY < screen.getY() + this.y + this.height - totalHeight) {
                 long capacity = storage.getCapacity();
-                List<Text> tooltip = FluidTexts.getTooltip(Fluids.EMPTY, capacity - totalAmount, capacity);
+                List<Text> tooltip = FluidTexts.getTooltip(FluidVariant.blank(), capacity - totalAmount, capacity, MinecraftClient.getInstance().options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.BASIC);
                 context.drawTooltip(textRenderer, tooltip, mouseX, mouseY);
             }
         }

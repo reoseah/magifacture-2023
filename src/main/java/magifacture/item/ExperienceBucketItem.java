@@ -11,7 +11,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 public class ExperienceBucketItem extends BucketItem {
-    public static final Item INSTANCE = new ExperienceBucketItem(ExperienceFluid.INSTANCE, new Settings().rarity(Rarity.RARE).maxCount(1).recipeRemainder(Items.BUCKET));
+    public static final Item INSTANCE = new ExperienceBucketItem(ExperienceFluid.INSTANCE, new Settings().rarity(Rarity.UNCOMMON).maxCount(1).recipeRemainder(Items.BUCKET));
 
     protected ExperienceBucketItem(Fluid fluid, Settings settings) {
         super(fluid, settings);

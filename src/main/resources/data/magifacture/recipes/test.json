@@ -9,7 +9,12 @@
   },
   "fluid": {
 	"variant": {
-	  "fluid": "magifacture:molten_magic_crystal"
+	  "fluid": "magifacture:molten_magic_crystal",
+	  "nbt": {
+		"Heat": 13.666666666666666,
+		"Power": 42,
+		"Purity": 69
+	  }
 	},
 	"amount": 81000
   },

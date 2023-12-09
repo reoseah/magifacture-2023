@@ -5,6 +5,7 @@ import magifacture.block.entity.*;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.fluid.MoltenMagicCrystalFluid;
 import magifacture.item.ExperienceBucketItem;
+import magifacture.item.MoltenMagicCrystalBucket;
 import magifacture.recipe.*;
 import magifacture.screen.AlembicScreenHandler;
 import magifacture.screen.CrematoriumScreenHandler;
@@ -12,9 +13,7 @@ import magifacture.screen.MixingColumnScreenHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.*;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.EmptyItemFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.FullItemFluidStorage;
 import net.minecraft.block.*;
@@ -42,9 +41,8 @@ public class Magifacture implements ModInitializer {
     public static final Block HIGHLY_INFUSED_GLASS = new Block(AbstractBlock.Settings.create().mapColor(MapColor.PINK).strength(2F).luminance(state -> 14).nonOpaque().sounds(BlockSoundGroup.GLASS));
     public static final Block MAGIC_CRYSTAL_BLOCK = new Block(AbstractBlock.Settings.create().mapColor(MapColor.YELLOW).strength(3F, 5F).luminance(state -> 15).sounds(BlockSoundGroup.AMETHYST_BLOCK));
 
-    public static final Item MOLTEN_MAGIC_CRYSTAL_BUCKET = new BucketItem(MoltenMagicCrystalFluid.Still.INSTANCE, new Item.Settings().recipeRemainder(Items.BUCKET).rarity(Rarity.RARE).maxCount(1));
     public static final Item ASH = new Item(new Item.Settings());
-    public static final Item MAGIC_CRYSTAL = new Item(new Item.Settings().rarity(Rarity.RARE));
+    public static final Item MAGIC_CRYSTAL = new Item(new Item.Settings().rarity(Rarity.UNCOMMON));
 
     @Override
     public void onInitialize() {
@@ -76,6 +74,20 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.FLUID, "magifacture:experience", ExperienceFluid.INSTANCE);
         Registry.register(Registries.FLUID, "magifacture:molten_magic_crystal", MoltenMagicCrystalFluid.Still.INSTANCE);
         Registry.register(Registries.FLUID, "magifacture:flowing_molten_magic_crystal", MoltenMagicCrystalFluid.Flowing.INSTANCE);
+
+        FluidVariantAttributes.register(ExperienceFluid.INSTANCE, new FluidVariantAttributeHandler() {
+            @Override
+            public Text getName(FluidVariant fluidVariant) {
+                return Text.translatable("block.magifacture.experience").formatted(Rarity.UNCOMMON.formatting);
+            }
+        });
+        FluidVariantAttributes.register(MoltenMagicCrystalFluid.Still.INSTANCE, new FluidVariantAttributeHandler() {
+            @Override
+            public Text getName(FluidVariant fluidVariant) {
+                return Text.translatable("block.magifacture.molten_magic_crystal").formatted(Rarity.UNCOMMON.formatting);
+            }
+        });
+
         Registry.register(Registries.ITEM, "magifacture:crematorium", CrematoriumBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:alembic", AlembicBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:infuser", InfuserBlock.ITEM);
@@ -84,10 +96,10 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.ITEM, "magifacture:magic_crystal_ore", new BlockItem(MAGIC_CRYSTAL_ORE, new Item.Settings().rarity(Rarity.UNCOMMON)));
         Registry.register(Registries.ITEM, "magifacture:infused_glass", new BlockItem(INFUSED_GLASS, new Item.Settings()));
         Registry.register(Registries.ITEM, "magifacture:highly_infused_glass", new BlockItem(HIGHLY_INFUSED_GLASS, new Item.Settings().rarity(Rarity.UNCOMMON)));
-        Registry.register(Registries.ITEM, "magifacture:magic_crystal_block", new BlockItem(MAGIC_CRYSTAL_BLOCK, new Item.Settings().rarity(Rarity.RARE)));
+        Registry.register(Registries.ITEM, "magifacture:magic_crystal_block", new BlockItem(MAGIC_CRYSTAL_BLOCK, new Item.Settings().rarity(Rarity.UNCOMMON)));
 
         Registry.register(Registries.ITEM, "magifacture:experience_bucket", ExperienceBucketItem.INSTANCE);
-        Registry.register(Registries.ITEM, "magifacture:molten_magic_crystal_bucket", MOLTEN_MAGIC_CRYSTAL_BUCKET);
+        Registry.register(Registries.ITEM, "magifacture:molten_magic_crystal_bucket", MoltenMagicCrystalBucket.INSTANCE);
         Registry.register(Registries.ITEM, "magifacture:ash", ASH);
         Registry.register(Registries.ITEM, "magifacture:magic_crystal", MAGIC_CRYSTAL);
 
@@ -107,7 +119,7 @@ public class Magifacture implements ModInitializer {
                 return this.fallbackBehavior.dispense(pointer, stack);
             }
         };
-        DispenserBlock.registerBehavior(MOLTEN_MAGIC_CRYSTAL_BUCKET, bucketBehavior);
+        DispenserBlock.registerBehavior(MoltenMagicCrystalBucket.INSTANCE, bucketBehavior);
 
         // noinspection UnstableApiUsage
         FluidStorage.combinedItemApiProvider(Items.GLASS_BOTTLE).register(context -> new EmptyItemFluidStorage(context, Items.EXPERIENCE_BOTTLE, ExperienceFluid.INSTANCE, FluidConstants.BOTTLE));
@@ -129,7 +141,7 @@ public class Magifacture implements ModInitializer {
                     entries.add(MAGIC_CRYSTAL_BLOCK);
 
                     entries.add(ExperienceBucketItem.INSTANCE);
-                    entries.add(MOLTEN_MAGIC_CRYSTAL_BUCKET);
+                    entries.add(MoltenMagicCrystalBucket.INSTANCE);
                     entries.add(ASH);
                     entries.add(MAGIC_CRYSTAL);
                 }) //
