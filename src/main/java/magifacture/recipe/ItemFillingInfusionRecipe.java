@@ -15,10 +15,9 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -116,9 +115,10 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
 
     public static Pair<ItemStack, Long> findFilledStack(ItemStack emptyStack, Fluid fluid) {
         Item item = emptyStack.getItem();
-        if (isEmptyBucket(item)) {
+        if (emptyStack.isOf(Items.BUCKET)) {
             Item fluidBucket = fluid.getBucketItem();
-            if (isValidBucketPair(item, fluidBucket, fluid)) {
+            if (fluidBucket.getRecipeRemainder() == item //
+                    && ((AccessibleBucketItem) fluidBucket).getFluid() == fluid) {
                 return Pair.of(new ItemStack(fluidBucket), FluidConstants.BUCKET);
             }
         }
@@ -140,14 +140,6 @@ public class ItemFillingInfusionRecipe extends InfusionRecipe {
             }
         }
         return null;
-    }
-
-    public static boolean isEmptyBucket(Item item) {
-        return item instanceof BucketItem bucket && ((AccessibleBucketItem) bucket).getFluid() == Fluids.EMPTY;
-    }
-
-    public static boolean isValidBucketPair(Item emptyBucket, Item filledBucket, Fluid fluid) {
-        return filledBucket.getRecipeRemainder() == emptyBucket && ((AccessibleBucketItem) filledBucket).getFluid() == fluid;
     }
 
     @Override

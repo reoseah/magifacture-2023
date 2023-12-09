@@ -4,9 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
 	"AccessibleBucketItem",
-	"AccessibleEmptyItemFluidStorage",
-	"AccessibleFullItemFluidStorage",
-	"FluidAccessor"
+	"AccessibleEmptyItemFluidStorage"
   ],
   "injectors": {
 	"defaultRequire": 1

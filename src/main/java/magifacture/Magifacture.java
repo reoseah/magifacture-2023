@@ -128,7 +128,8 @@ public class Magifacture implements ModInitializer {
         FluidStorage.combinedItemApiProvider(Items.EXPERIENCE_BOTTLE).register(context -> new FullItemFluidStorage(context, Items.GLASS_BOTTLE, FluidVariant.of(ExperienceFluid.INSTANCE), FluidConstants.BOTTLE));
         // noinspection UnstableApiUsage
         FluidStorage.combinedItemApiProvider(Items.BUCKET).register(EmptyBucketMoltenMagicCrystalStorage::new);
-
+        // noinspection UnstableApiUsage
+        FluidStorage.combinedItemApiProvider(MoltenMagicCrystalBucket.INSTANCE).register(MoltenMagicCrystalBucket.FluidStorage::new);
 
         ItemGroup itemGroup = FabricItemGroup.builder() //
                 .displayName(Text.translatable("itemGroup.magifacture")) //
