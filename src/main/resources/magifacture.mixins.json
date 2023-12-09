@@ -6,7 +6,6 @@
 	"AccessibleBucketItem",
 	"AccessibleEmptyItemFluidStorage",
 	"AccessibleFullItemFluidStorage",
-	"EmptyBucketStorageMixin",
 	"FluidAccessor"
   ],
   "injectors": {

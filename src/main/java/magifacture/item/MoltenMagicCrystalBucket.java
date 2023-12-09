@@ -15,11 +15,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MoltenMagicCrystalBucket extends BucketItem {
-    public static final Item INSTANCE = new MoltenMagicCrystalBucket(MoltenMagicCrystalFluid.Still.INSTANCE, new Item.Settings().recipeRemainder(Items.BUCKET).rarity(Rarity.UNCOMMON).maxCount(1));
+public class MoltenMagicCrystalBucket extends Item {
+    public static final Item INSTANCE = new MoltenMagicCrystalBucket(new Item.Settings().recipeRemainder(Items.BUCKET).rarity(Rarity.UNCOMMON).maxCount(1));
 
-    public MoltenMagicCrystalBucket(Fluid fluid, Settings settings) {
-        super(fluid, settings);
+    public MoltenMagicCrystalBucket(Settings settings) {
+        super(settings);
     }
 
     @Override

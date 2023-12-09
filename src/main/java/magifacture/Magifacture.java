@@ -10,6 +10,7 @@ import magifacture.recipe.*;
 import magifacture.screen.AlembicScreenHandler;
 import magifacture.screen.CrematoriumScreenHandler;
 import magifacture.screen.MixingColumnScreenHandler;
+import magifacture.util.EmptyBucketMoltenMagicCrystalStorage;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
@@ -125,6 +126,9 @@ public class Magifacture implements ModInitializer {
         FluidStorage.combinedItemApiProvider(Items.GLASS_BOTTLE).register(context -> new EmptyItemFluidStorage(context, Items.EXPERIENCE_BOTTLE, ExperienceFluid.INSTANCE, FluidConstants.BOTTLE));
         // noinspection UnstableApiUsage
         FluidStorage.combinedItemApiProvider(Items.EXPERIENCE_BOTTLE).register(context -> new FullItemFluidStorage(context, Items.GLASS_BOTTLE, FluidVariant.of(ExperienceFluid.INSTANCE), FluidConstants.BOTTLE));
+        // noinspection UnstableApiUsage
+        FluidStorage.combinedItemApiProvider(Items.BUCKET).register(EmptyBucketMoltenMagicCrystalStorage::new);
+
 
         ItemGroup itemGroup = FabricItemGroup.builder() //
                 .displayName(Text.translatable("itemGroup.magifacture")) //
