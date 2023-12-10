@@ -3,9 +3,9 @@ package magifacture.screen;
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import magifacture.block.entity.MixingColumnBlockEntity;
+import magifacture.fluid.transfer.FluidTransferUtils;
+import magifacture.fluid.transfer.MultipleFluidStorage;
 import magifacture.screen.slot.SimpleOutputSlot;
-import magifacture.fluid.storage.FluidTransferUtils;
-import magifacture.fluid.storage.MultipleFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -66,7 +66,7 @@ public class MixingColumnScreenHandler extends MagifactureScreenHandler {
 
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
-        Object2LongMap<FluidVariant> fluids = this.storage.getFluids();
+        Object2LongMap<FluidVariant> fluids = this.storage.getFluidMap();
         if (id != 0 && id < fluids.size()) {
             FluidVariant fluid = fluids.keySet().stream().skip(id).findFirst().orElse(FluidVariant.blank());
             long amount = fluids.getLong(fluid);

@@ -2,9 +2,9 @@ package magifacture.block.entity;
 
 import lombok.Getter;
 import magifacture.block.MixingColumnBlock;
+import magifacture.fluid.transfer.FluidTransferUtils;
+import magifacture.fluid.transfer.MultipleFluidStorage;
 import magifacture.screen.MixingColumnScreenHandler;
-import magifacture.fluid.storage.FluidTransferUtils;
-import magifacture.fluid.storage.MultipleFluidStorage;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;

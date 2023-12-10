@@ -1,4 +1,4 @@
-package magifacture.fluid.storage;
+package magifacture.fluid.transfer;
 
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
@@ -20,7 +20,7 @@ public abstract class MultipleFluidStorage //
         extends SnapshotParticipant<Object2LongMap<FluidVariant>> //
         implements Storage<FluidVariant> {
     @Getter
-    protected Object2LongMap<FluidVariant> fluids = new Object2LongLinkedOpenHashMap<>();
+    protected Object2LongMap<FluidVariant> fluidMap = new Object2LongLinkedOpenHashMap<>();
 
     public MultipleFluidStorage() {
     }
@@ -38,12 +38,12 @@ public abstract class MultipleFluidStorage //
 
     @Override
     protected Object2LongMap<FluidVariant> createSnapshot() {
-        return new Object2LongLinkedOpenHashMap<>(this.fluids);
+        return new Object2LongLinkedOpenHashMap<>(this.fluidMap);
     }
 
     @Override
     protected void readSnapshot(Object2LongMap<FluidVariant> snapshot) {
-        this.fluids = snapshot;
+        this.fluidMap = snapshot;
     }
 
     @Override
@@ -52,15 +52,15 @@ public abstract class MultipleFluidStorage //
             return 0;
         }
 
-        long total = this.fluids.values().longStream().sum();
+        long total = this.fluidMap.values().longStream().sum();
         long inserted = Math.min(maxAmount, this.getCapacity() - total);
         if (inserted <= 0) {
             return 0;
         }
 
-        long current = this.fluids.getOrDefault(resource, 0);
+        long current = this.fluidMap.getOrDefault(resource, 0);
         this.updateSnapshots(transaction);
-        this.fluids.put(resource, current + inserted);
+        this.fluidMap.put(resource, current + inserted);
 
         return inserted;
     }
@@ -71,20 +71,20 @@ public abstract class MultipleFluidStorage //
             return 0;
         }
 
-        long current = this.fluids.getOrDefault(resource, 0);
+        long current = this.fluidMap.getOrDefault(resource, 0);
         long extracted = Math.min(maxAmount, current);
         if (extracted <= 0) {
             return 0;
         }
         this.updateSnapshots(transaction);
-        this.fluids.put(resource, current - extracted);
+        this.fluidMap.put(resource, current - extracted);
 
         return extracted;
     }
 
     @Override
     public @NotNull Iterator<StorageView<FluidVariant>> iterator() {
-        return this.fluids.keySet() //
+        return this.fluidMap.keySet() //
                 .stream() //
                 .map(variant -> (StorageView<FluidVariant>) new StorageView<FluidVariant>() {
                     @Override
@@ -93,13 +93,13 @@ public abstract class MultipleFluidStorage //
                             return 0;
                         }
 
-                        long current = fluids.getLong(variant);
+                        long current = fluidMap.getLong(variant);
                         long extracted = Math.min(maxAmount, current);
                         if (extracted <= 0) {
                             return 0;
                         }
                         MultipleFluidStorage.this.updateSnapshots(transaction);
-                        fluids.put(variant, current - extracted);
+                        fluidMap.put(variant, current - extracted);
 
                         return extracted;
                     }
@@ -116,7 +116,7 @@ public abstract class MultipleFluidStorage //
 
                     @Override
                     public long getAmount() {
-                        return fluids.getLong(variant);
+                        return fluidMap.getLong(variant);
                     }
 
                     @Override
@@ -129,21 +129,21 @@ public abstract class MultipleFluidStorage //
     @Override
     protected void onFinalCommit() {
         super.onFinalCommit();
-        this.fluids.object2LongEntrySet().removeIf(entry -> entry.getLongValue() <= 0);
+        this.fluidMap.object2LongEntrySet().removeIf(entry -> entry.getLongValue() <= 0);
     }
 
     public void readNbt(NbtCompound nbt) {
-        this.fluids.clear();
+        this.fluidMap.clear();
         NbtList fluids = nbt.getList("fluids", NbtElement.COMPOUND_TYPE);
         for (int i = 0; i < fluids.size(); i++) {
             NbtCompound fluid = fluids.getCompound(i);
-            this.fluids.put(FluidVariant.fromNbt(fluid.getCompound("fluid")), fluid.getLong("amount"));
+            this.fluidMap.put(FluidVariant.fromNbt(fluid.getCompound("fluid")), fluid.getLong("amount"));
         }
     }
 
     public void writeNbt(NbtCompound nbt) {
         NbtList fluids = new NbtList();
-        for (Object2LongMap.Entry<FluidVariant> entry : this.fluids.object2LongEntrySet()) {
+        for (Object2LongMap.Entry<FluidVariant> entry : this.fluidMap.object2LongEntrySet()) {
             NbtCompound fluid = new NbtCompound();
             fluid.put("fluid", entry.getKey().toNbt());
             fluid.putLong("amount", entry.getLongValue());

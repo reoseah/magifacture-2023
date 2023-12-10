@@ -1,7 +1,7 @@
-package magifacture.fluid.storage;
+package magifacture.fluid.transfer;
 
-import magifacture.fluid.MoltenMagicCrystalFluid;
-import magifacture.item.MoltenMagicCrystalBucket;
+import magifacture.fluid.MagicCrystalFluid;
+import magifacture.item.MagicCrystalBucketItem;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -34,8 +34,8 @@ public class MagifactureEmptyBucketStorage implements InsertionOnlyStorage<Fluid
         if (!this.context.getItemVariant().isOf(Items.BUCKET)) {
             return 0;
         }
-        if (resource.isOf(MoltenMagicCrystalFluid.Still.INSTANCE) && maxAmount >= FluidConstants.BUCKET) {
-            ItemVariant full = ItemVariant.of(MoltenMagicCrystalBucket.INSTANCE, resource.hasNbt() ? resource.getNbt().copy() : null);
+        if (resource.isOf(MagicCrystalFluid.Still.INSTANCE) && maxAmount >= FluidConstants.BUCKET) {
+            ItemVariant full = ItemVariant.of(MagicCrystalBucketItem.INSTANCE, resource.hasNbt() ? resource.getNbt().copy() : null);
             if (context.exchange(full, 1, transaction) == 1) {
                 return FluidConstants.BUCKET;
             }

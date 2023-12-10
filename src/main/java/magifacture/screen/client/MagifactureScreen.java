@@ -1,10 +1,10 @@
 package magifacture.screen.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import magifacture.fluid.transfer.MultipleFluidStorage;
 import magifacture.screen.MagifactureScreenHandler;
 import magifacture.screen.widget.MultipleFluidWidget;
 import magifacture.screen.widget.SimpleFluidWidget;
-import magifacture.fluid.storage.MultipleFluidStorage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;

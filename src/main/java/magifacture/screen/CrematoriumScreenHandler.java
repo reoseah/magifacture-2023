@@ -1,10 +1,10 @@
 package magifacture.screen;
 
 import magifacture.block.entity.CrematoriumBlockEntity;
+import magifacture.fluid.transfer.FluidTransferUtils;
 import magifacture.recipe.CremationRecipe;
 import magifacture.screen.slot.SimpleFuelSlot;
 import magifacture.screen.slot.SimpleOutputSlot;
-import magifacture.fluid.storage.FluidTransferUtils;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.entity.player.PlayerInventory;

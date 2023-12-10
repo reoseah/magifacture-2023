@@ -28,9 +28,9 @@ public class MixingColumnExtensionBlockEntity extends BlockEntity implements Nam
     }
 
     public static MixingColumnExtensionBlockEntity from(MixingColumnBlockEntity previous, MixingColumnBlockEntity newMain) {
-        previous.fluidStorage.getFluids().object2LongEntrySet().forEach(entry -> {
-            long sum = entry.getLongValue() + newMain.fluidStorage.getFluids().getOrDefault(entry.getKey(), 0);
-            newMain.fluidStorage.getFluids().put(entry.getKey(), sum);
+        previous.fluidStorage.getFluidMap().object2LongEntrySet().forEach(entry -> {
+            long sum = entry.getLongValue() + newMain.fluidStorage.getFluidMap().getOrDefault(entry.getKey(), 0);
+            newMain.fluidStorage.getFluidMap().put(entry.getKey(), sum);
         });
 
         MixingColumnExtensionBlockEntity be = new MixingColumnExtensionBlockEntity(previous.getPos(), previous.getCachedState());

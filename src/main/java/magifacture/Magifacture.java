@@ -3,14 +3,14 @@ package magifacture;
 import magifacture.block.*;
 import magifacture.block.entity.*;
 import magifacture.fluid.ExperienceFluid;
-import magifacture.fluid.MoltenMagicCrystalFluid;
+import magifacture.fluid.MagicCrystalFluid;
+import magifacture.fluid.transfer.MagifactureEmptyBucketStorage;
 import magifacture.item.ExperienceBucketItem;
-import magifacture.item.MoltenMagicCrystalBucket;
+import magifacture.item.MagicCrystalBucketItem;
 import magifacture.recipe.*;
 import magifacture.screen.AlembicScreenHandler;
 import magifacture.screen.CrematoriumScreenHandler;
 import magifacture.screen.MixingColumnScreenHandler;
-import magifacture.fluid.storage.MagifactureEmptyBucketStorage;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
@@ -73,8 +73,8 @@ public class Magifacture implements ModInitializer {
         FluidStorage.SIDED.registerForBlockEntity((be, side) -> be.getFluidStorage(), MixingColumnBlockEntity.TYPE);
 
         Registry.register(Registries.FLUID, "magifacture:experience", ExperienceFluid.INSTANCE);
-        Registry.register(Registries.FLUID, "magifacture:molten_magic_crystal", MoltenMagicCrystalFluid.Still.INSTANCE);
-        Registry.register(Registries.FLUID, "magifacture:flowing_molten_magic_crystal", MoltenMagicCrystalFluid.Flowing.INSTANCE);
+        Registry.register(Registries.FLUID, "magifacture:molten_magic_crystal", MagicCrystalFluid.Still.INSTANCE);
+        Registry.register(Registries.FLUID, "magifacture:flowing_molten_magic_crystal", MagicCrystalFluid.Flowing.INSTANCE);
 
         FluidVariantAttributes.register(ExperienceFluid.INSTANCE, new FluidVariantAttributeHandler() {
             @Override
@@ -82,7 +82,7 @@ public class Magifacture implements ModInitializer {
                 return Text.translatable("block.magifacture.experience").formatted(Rarity.UNCOMMON.formatting);
             }
         });
-        FluidVariantAttributes.register(MoltenMagicCrystalFluid.Still.INSTANCE, new FluidVariantAttributeHandler() {
+        FluidVariantAttributes.register(MagicCrystalFluid.Still.INSTANCE, new FluidVariantAttributeHandler() {
             @Override
             public Text getName(FluidVariant fluidVariant) {
                 return Text.translatable("block.magifacture.molten_magic_crystal").formatted(Rarity.UNCOMMON.formatting);
@@ -100,7 +100,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.ITEM, "magifacture:magic_crystal_block", new BlockItem(MAGIC_CRYSTAL_BLOCK, new Item.Settings().rarity(Rarity.UNCOMMON)));
 
         Registry.register(Registries.ITEM, "magifacture:experience_bucket", ExperienceBucketItem.INSTANCE);
-        Registry.register(Registries.ITEM, "magifacture:molten_magic_crystal_bucket", MoltenMagicCrystalBucket.INSTANCE);
+        Registry.register(Registries.ITEM, "magifacture:molten_magic_crystal_bucket", MagicCrystalBucketItem.INSTANCE);
         Registry.register(Registries.ITEM, "magifacture:ash", ASH);
         Registry.register(Registries.ITEM, "magifacture:magic_crystal", MAGIC_CRYSTAL);
 
@@ -120,7 +120,7 @@ public class Magifacture implements ModInitializer {
                 return this.fallbackBehavior.dispense(pointer, stack);
             }
         };
-        DispenserBlock.registerBehavior(MoltenMagicCrystalBucket.INSTANCE, bucketBehavior);
+        DispenserBlock.registerBehavior(MagicCrystalBucketItem.INSTANCE, bucketBehavior);
 
         // noinspection UnstableApiUsage
         FluidStorage.combinedItemApiProvider(Items.GLASS_BOTTLE).register(context -> new EmptyItemFluidStorage(context, Items.EXPERIENCE_BOTTLE, ExperienceFluid.INSTANCE, FluidConstants.BOTTLE));
@@ -129,7 +129,7 @@ public class Magifacture implements ModInitializer {
         // noinspection UnstableApiUsage
         FluidStorage.combinedItemApiProvider(Items.BUCKET).register(MagifactureEmptyBucketStorage::new);
         // noinspection UnstableApiUsage
-        FluidStorage.combinedItemApiProvider(MoltenMagicCrystalBucket.INSTANCE).register(MoltenMagicCrystalBucket.FluidStorage::new);
+        FluidStorage.combinedItemApiProvider(MagicCrystalBucketItem.INSTANCE).register(MagicCrystalBucketItem.FluidStorage::new);
 
         ItemGroup itemGroup = FabricItemGroup.builder() //
                 .displayName(Text.translatable("itemGroup.magifacture")) //
@@ -146,7 +146,7 @@ public class Magifacture implements ModInitializer {
                     entries.add(MAGIC_CRYSTAL_BLOCK);
 
                     entries.add(ExperienceBucketItem.INSTANCE);
-                    entries.add(MoltenMagicCrystalBucket.INSTANCE);
+                    entries.add(MagicCrystalBucketItem.INSTANCE);
                     entries.add(ASH);
                     entries.add(MAGIC_CRYSTAL);
                 }) //

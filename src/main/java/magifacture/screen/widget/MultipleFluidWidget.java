@@ -1,10 +1,10 @@
 package magifacture.screen.widget;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import magifacture.fluid.transfer.MultipleFluidStorage;
 import magifacture.screen.client.MagifactureScreen;
 import magifacture.screen.util.FluidRendering;
 import magifacture.screen.util.FluidTexts;
-import magifacture.fluid.storage.MultipleFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -42,7 +42,7 @@ public class MultipleFluidWidget implements Element, Drawable {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         int total = 0;
-        for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluids().object2LongEntrySet()) {
+        for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluidMap().object2LongEntrySet()) {
             FluidVariant variant = entry.getKey();
             long amount = entry.getLongValue();
 
@@ -73,7 +73,7 @@ public class MultipleFluidWidget implements Element, Drawable {
         if (this.isMouseOver(mouseX, mouseY)) {
             int totalHeight = 0;
             long totalAmount = 0;
-            for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluids().object2LongEntrySet()) {
+            for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluidMap().object2LongEntrySet()) {
                 FluidVariant variant = entry.getKey();
                 long amount = entry.getLongValue();
 
@@ -119,7 +119,7 @@ public class MultipleFluidWidget implements Element, Drawable {
         if (this.onClick != null && this.isMouseOver(mouseX, mouseY)) {
             int totalHeight = 0;
             int idx = 0;
-            for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluids().object2LongEntrySet()) {
+            for (Object2LongMap.Entry<FluidVariant> entry : this.storage.getFluidMap().object2LongEntrySet()) {
                 FluidVariant variant = entry.getKey();
                 long amount = entry.getLongValue();
 

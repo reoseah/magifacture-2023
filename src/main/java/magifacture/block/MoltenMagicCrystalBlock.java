@@ -1,7 +1,7 @@
 package magifacture.block;
 
 import magifacture.Magifacture;
-import magifacture.fluid.MoltenMagicCrystalFluid;
+import magifacture.fluid.MagicCrystalFluid;
 import net.minecraft.block.*;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.fluid.FlowableFluid;
@@ -12,7 +12,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class MoltenMagicCrystalBlock extends FluidBlock {
-    public static final FluidBlock INSTANCE = new MoltenMagicCrystalBlock(MoltenMagicCrystalFluid.Still.INSTANCE, Magifacture.INFUSED_STONE, AbstractBlock.Settings.copy(Blocks.LAVA));
+    public static final FluidBlock INSTANCE = new MoltenMagicCrystalBlock(MagicCrystalFluid.Still.INSTANCE, Magifacture.INFUSED_STONE, AbstractBlock.Settings.copy(Blocks.LAVA));
 
     public final Block solidified;
 

@@ -2,7 +2,7 @@ package magifacture.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import magifacture.fluid.storage.FluidTransferUtils;
+import magifacture.fluid.transfer.FluidTransferUtils;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.enchantment.Enchantment;
