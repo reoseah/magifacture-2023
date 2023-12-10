@@ -2,9 +2,9 @@ package magifacture.screen.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import magifacture.screen.MagifactureScreenHandler;
-import magifacture.screen.widget.MultipleFluidDrawable;
-import magifacture.screen.widget.SimpleFluidDrawable;
-import magifacture.util.MultipleFluidStorage;
+import magifacture.screen.widget.MultipleFluidWidget;
+import magifacture.screen.widget.SimpleFluidWidget;
+import magifacture.fluid.storage.MultipleFluidStorage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -28,14 +28,14 @@ public abstract class MagifactureScreen<T extends MagifactureScreenHandler> exte
 
     public abstract Identifier getTextureId();
 
-    protected SimpleFluidDrawable addTankRender(SingleFluidStorage tank, int x, int y, int width, int height) {
-        SimpleFluidDrawable widget = new SimpleFluidDrawable(this, tank, x, y, width, height);
+    protected SimpleFluidWidget addTankRender(SingleFluidStorage tank, int x, int y, int width, int height) {
+        SimpleFluidWidget widget = new SimpleFluidWidget(this, tank, x, y, width, height);
         this.addDrawable(widget);
         return widget;
     }
 
-    protected MultipleFluidDrawable addTankRender(MultipleFluidStorage tank, int x, int y, int width, int height, ObjIntConsumer<FluidVariant> onClick) {
-        MultipleFluidDrawable widget = new MultipleFluidDrawable(this, tank, x, y, width, height, onClick);
+    protected MultipleFluidWidget addTankRender(MultipleFluidStorage tank, int x, int y, int width, int height, ObjIntConsumer<FluidVariant> onClick) {
+        MultipleFluidWidget widget = new MultipleFluidWidget(this, tank, x, y, width, height, onClick);
         this.addDrawable(widget);
         ((List<Element>) this.children()).add(widget);
         return widget;

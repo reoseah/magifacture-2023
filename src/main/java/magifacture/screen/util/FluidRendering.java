@@ -1,4 +1,4 @@
-package magifacture.util;
+package magifacture.screen.util;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

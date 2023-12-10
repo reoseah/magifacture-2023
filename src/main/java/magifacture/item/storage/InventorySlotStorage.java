@@ -1,4 +1,4 @@
-package magifacture.util;
+package magifacture.item.storage;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;

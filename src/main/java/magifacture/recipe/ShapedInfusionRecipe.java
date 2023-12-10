@@ -6,7 +6,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import magifacture.block.entity.InfuserBlockEntity;
-import magifacture.util.FluidTransferUtils;
+import magifacture.fluid.storage.FluidTransferUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;

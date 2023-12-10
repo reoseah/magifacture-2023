@@ -1,8 +1,8 @@
 package magifacture.screen.widget;
 
 import magifacture.screen.client.MagifactureScreen;
-import magifacture.util.FluidRendering;
-import magifacture.util.FluidTexts;
+import magifacture.screen.util.FluidRendering;
+import magifacture.screen.util.FluidTexts;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.client.MinecraftClient;
@@ -15,7 +15,7 @@ import net.minecraft.util.math.MathHelper;
 
 import java.util.List;
 
-public class SimpleFluidDrawable implements Drawable {
+public class SimpleFluidWidget implements Drawable {
     protected final MagifactureScreen<?> screen;
     protected final SingleFluidStorage storage;
     private final int x;
@@ -24,7 +24,7 @@ public class SimpleFluidDrawable implements Drawable {
     private final int width;
     private final int height;
 
-    public SimpleFluidDrawable(MagifactureScreen<?> screen, SingleFluidStorage storage, int x, int y, int width, int height) {
+    public SimpleFluidWidget(MagifactureScreen<?> screen, SingleFluidStorage storage, int x, int y, int width, int height) {
         this.screen = screen;
         this.storage = storage;
         this.x = x;

@@ -2,9 +2,9 @@ package magifacture.screen.widget;
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import magifacture.screen.client.MagifactureScreen;
-import magifacture.util.FluidRendering;
-import magifacture.util.FluidTexts;
-import magifacture.util.MultipleFluidStorage;
+import magifacture.screen.util.FluidRendering;
+import magifacture.screen.util.FluidTexts;
+import magifacture.fluid.storage.MultipleFluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -12,7 +12,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.ObjIntConsumer;
 
-public class MultipleFluidDrawable implements Element, Drawable {
+public class MultipleFluidWidget implements Element, Drawable {
     protected final MagifactureScreen<?> screen;
     protected final MultipleFluidStorage storage;
     private final int x;
@@ -30,7 +29,7 @@ public class MultipleFluidDrawable implements Element, Drawable {
     private final int height;
     private final @Nullable ObjIntConsumer<FluidVariant> onClick;
 
-    public MultipleFluidDrawable(MagifactureScreen<?> screen, MultipleFluidStorage storage, int x, int y, int width, int height, ObjIntConsumer<FluidVariant> onClick) {
+    public MultipleFluidWidget(MagifactureScreen<?> screen, MultipleFluidStorage storage, int x, int y, int width, int height, ObjIntConsumer<FluidVariant> onClick) {
         this.screen = screen;
         this.storage = storage;
         this.x = x;

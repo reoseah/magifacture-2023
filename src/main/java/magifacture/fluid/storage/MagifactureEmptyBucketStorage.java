@@ -1,4 +1,4 @@
-package magifacture.util;
+package magifacture.fluid.storage;
 
 import magifacture.fluid.MoltenMagicCrystalFluid;
 import magifacture.item.MoltenMagicCrystalBucket;
@@ -16,11 +16,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.List;
 
-public class EmptyBucketMoltenMagicCrystalStorage implements InsertionOnlyStorage<FluidVariant> {
+public class MagifactureEmptyBucketStorage implements InsertionOnlyStorage<FluidVariant> {
     private final List<StorageView<FluidVariant>> view = List.of(new BlankVariantView<>(FluidVariant.blank(), FluidConstants.BUCKET));
     private final ContainerItemContext context;
 
-    public EmptyBucketMoltenMagicCrystalStorage(ContainerItemContext context) {
+    public MagifactureEmptyBucketStorage(ContainerItemContext context) {
         this.context = context;
     }
 
@@ -35,8 +35,8 @@ public class EmptyBucketMoltenMagicCrystalStorage implements InsertionOnlyStorag
             return 0;
         }
         if (resource.isOf(MoltenMagicCrystalFluid.Still.INSTANCE) && maxAmount >= FluidConstants.BUCKET) {
-            ItemVariant itemVariant = ItemVariant.of(MoltenMagicCrystalBucket.INSTANCE, resource.hasNbt() ? resource.getNbt().copy() : null);
-            if (context.exchange(itemVariant, 1, transaction) == 1) {
+            ItemVariant full = ItemVariant.of(MoltenMagicCrystalBucket.INSTANCE, resource.hasNbt() ? resource.getNbt().copy() : null);
+            if (context.exchange(full, 1, transaction) == 1) {
                 return FluidConstants.BUCKET;
             }
         }

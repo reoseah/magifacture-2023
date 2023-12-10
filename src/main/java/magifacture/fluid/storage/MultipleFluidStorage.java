@@ -1,4 +1,4 @@
-package magifacture.util;
+package magifacture.fluid.storage;
 
 import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;

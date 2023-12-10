@@ -7,7 +7,7 @@ import magifacture.block.entity.component.RecipeHandler;
 import magifacture.fluid.ExperienceFluid;
 import magifacture.recipe.CremationRecipe;
 import magifacture.screen.CrematoriumScreenHandler;
-import magifacture.util.FluidTransferUtils;
+import magifacture.fluid.storage.FluidTransferUtils;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;

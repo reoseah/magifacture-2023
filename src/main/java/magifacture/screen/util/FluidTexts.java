@@ -1,4 +1,4 @@
-package magifacture.util;
+package magifacture.screen.util;
 
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
