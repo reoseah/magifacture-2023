@@ -46,12 +46,50 @@ import java.util.List;
  * in Transfer API that ignore NBT data.
  */
 public class MagicCrystalBucketItem extends Item implements FluidModificationItem {
-    public static final Item INSTANCE = new MagicCrystalBucketItem(new Item.Settings().recipeRemainder(Items.BUCKET).rarity(Rarity.UNCOMMON).maxCount(1));
+    public static final Item INSTANCE = new MagicCrystalBucketItem(new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1));
 
     private final Fluid fluid = MagicCrystalFluid.Still.INSTANCE;
 
     public MagicCrystalBucketItem(Settings settings) {
         super(settings);
+    }
+
+    public static ItemStack createStack(float power, float purity, float heat) {
+        ItemStack stack = new ItemStack(INSTANCE);
+        stack.getOrCreateNbt().putFloat(MagicCrystalFluid.POWER_KEY, power);
+        stack.getOrCreateNbt().putFloat(MagicCrystalFluid.PURITY_KEY, purity);
+        stack.getOrCreateNbt().putFloat(MagicCrystalFluid.HEAT_KEY, heat);
+        return stack;
+    }
+
+    public String getTranslationKey(ItemStack stack) {
+        NbtCompound nbt = stack.getNbt();
+
+        float power = nbt != null ? nbt.getFloat(MagicCrystalFluid.POWER_KEY) : 0;
+        float purity = nbt != null ? nbt.getFloat(MagicCrystalFluid.PURITY_KEY) : 0;
+
+        if (power < 45 && purity < 45) {
+            return "item.magifacture.molten_magic_crystal_bucket.low_power_low_purity";
+        } else if (power < 90 && purity < 45) {
+            return "item.magifacture.molten_magic_crystal_bucket.high_power_low_purity";
+        } else if (power < 45 && purity < 90) {
+            return "item.magifacture.molten_magic_crystal_bucket.low_power_high_purity";
+        } else if (power < 90 && purity < 90) {
+            return "item.magifacture.molten_magic_crystal_bucket.high_power_high_purity";
+        }
+
+        return this.getTranslationKey();
+    }
+
+    @Override
+    public Rarity getRarity(ItemStack stack) {
+        NbtCompound nbt = stack.getNbt();
+        float power = nbt != null ? nbt.getFloat(MagicCrystalFluid.POWER_KEY) : 0;
+
+        if (power < 45) {
+            return Rarity.COMMON;
+        }
+        return Rarity.UNCOMMON;
     }
 
     @Override

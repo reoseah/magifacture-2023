@@ -1,11 +1,13 @@
 package magifacture.fluid;
 
-import magifacture.block.MoltenMagicCrystalBlock;
+import magifacture.block.MagicCrystalFluidBlock;
 import magifacture.item.MagicCrystalBucketItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRenderHandler;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributeHandler;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.fluid.FlowableFluid;
@@ -17,6 +19,8 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Rarity;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
@@ -54,7 +58,7 @@ public abstract class MagicCrystalFluid extends LavaLikeFluid {
 
     @Override
     protected BlockState toBlockState(FluidState state) {
-        return MoltenMagicCrystalBlock.INSTANCE.getDefaultState() //
+        return MagicCrystalFluidBlock.INSTANCE.getDefaultState() //
                 .with(Properties.LEVEL_15, getBlockStateLevel(state));
     }
 
@@ -79,6 +83,29 @@ public abstract class MagicCrystalFluid extends LavaLikeFluid {
         copy.putFloat(PURITY_KEY, nbt.getFloat(PURITY_KEY));
         copy.putFloat(HEAT_KEY, nbt.getFloat(HEAT_KEY));
         return copy;
+    }
+
+    public static ResourceAmount<FluidVariant> mix(ResourceAmount<FluidVariant> first, ResourceAmount<FluidVariant> second) {
+        NbtCompound resultNbt = new NbtCompound();
+        long resultAmount = first.amount() + second.amount();
+
+        float firstPower = first.resource().hasNbt() ? first.resource().getNbt().getFloat(POWER_KEY) : 0;
+        float firstPurity = first.resource().hasNbt() ? first.resource().getNbt().getFloat(PURITY_KEY) : 0;
+        float firstHeat = first.resource().hasNbt() ? first.resource().getNbt().getFloat(HEAT_KEY) : 0;
+        float secondPower = second.resource().hasNbt() ? second.resource().getNbt().getFloat(POWER_KEY) : 0;
+        float secondPurity = second.resource().hasNbt() ? second.resource().getNbt().getFloat(PURITY_KEY) : 0;
+        float secondHeat = second.resource().hasNbt() ? second.resource().getNbt().getFloat(HEAT_KEY) : 0;
+
+        float resultPower = MathHelper.lerp((float) second.amount() / resultAmount, firstPower, secondPower);
+        float resultPurity = MathHelper.lerp((float) second.amount() / resultAmount, firstPurity, secondPurity);
+        float resultHeat = MathHelper.lerp((float) second.amount() / resultAmount, firstHeat, secondHeat);
+
+        resultNbt.putFloat(POWER_KEY, resultPower);
+        resultNbt.putFloat(PURITY_KEY, resultPurity);
+        resultNbt.putFloat(HEAT_KEY, resultHeat);
+
+        FluidVariant resultVariant = FluidVariant.of(MagicCrystalFluid.Still.INSTANCE, resultNbt);
+        return new ResourceAmount<>(resultVariant, resultAmount);
     }
 
     public static class Flowing extends MagicCrystalFluid {
@@ -123,6 +150,32 @@ public abstract class MagicCrystalFluid extends LavaLikeFluid {
         public void appendTooltip(FluidVariant fluidVariant, List<Text> tooltip, TooltipContext tooltipContext) {
             NbtCompound nbt = fluidVariant.getNbt();
             MagicCrystalFluid.appendTooltip(nbt, tooltip);
+        }
+    }
+
+    public static class VariantAttributes implements FluidVariantAttributeHandler {
+        public static final FluidVariantAttributeHandler INSTANCE = new VariantAttributes();
+
+        @Override
+        public Text getName(FluidVariant fluidVariant) {
+            NbtCompound nbt = fluidVariant.getNbt();
+
+            float power = nbt != null ? nbt.getFloat(POWER_KEY) : 0;
+            float purity = nbt != null ? nbt.getFloat(PURITY_KEY) : 0;
+
+            Formatting rarity = (power < 45 ? Rarity.COMMON : Rarity.UNCOMMON).formatting;
+
+            if (power < 45 && purity < 45) {
+                return Text.translatable("block.magifacture.molten_magic_crystal.low_power_low_purity").formatted(rarity);
+            } else if (power < 90 && purity < 45) {
+                return Text.translatable("block.magifacture.molten_magic_crystal.high_power_low_purity").formatted(rarity);
+            } else if (power < 45 && purity < 90) {
+                return Text.translatable("block.magifacture.molten_magic_crystal.low_power_high_purity").formatted(rarity);
+            } else if (power < 90 && purity < 90) {
+                return Text.translatable("block.magifacture.molten_magic_crystal.high_power_high_purity").formatted(rarity);
+            }
+
+            return Text.translatable("block.magifacture.molten_magic_crystal").formatted(rarity);
         }
     }
 }

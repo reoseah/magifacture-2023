@@ -40,10 +40,14 @@ public class FluidTexts {
         return Text.translatable("magifacture.amount_and_capacity", formatAmount(amount), formatAmount(capacity));
     }
 
+    public static Text getName(FluidVariant variant) {
+        return variant.isBlank() ? Text.translatable("magifacture.empty") : FluidVariantAttributes.getName(variant);
+    }
+
     public static List<Text> getTooltip(FluidVariant variant, long amount, TooltipContext context) {
         List<Text> tooltip = new ArrayList<>();
 
-        tooltip.add(FluidVariantAttributes.getName(variant));
+        tooltip.add(getName(variant));
         FluidVariantRendering.getHandlerOrDefault(variant.getFluid()).appendTooltip(variant, tooltip, TooltipContext.BASIC);
         tooltip.add(formatAmount(amount).formatted(Formatting.GRAY));
 
@@ -57,7 +61,7 @@ public class FluidTexts {
     public static List<Text> getTooltip(FluidVariant variant, long amount, long capacity, TooltipContext context) {
         List<Text> tooltip = new ArrayList<>();
 
-        tooltip.add(FluidVariantAttributes.getName(variant));
+        tooltip.add(getName(variant));
         FluidVariantRendering.getHandlerOrDefault(variant.getFluid()).appendTooltip(variant, tooltip, context);
         tooltip.add(formatAmountAndCapacity(amount, capacity).formatted(Formatting.GRAY));
 

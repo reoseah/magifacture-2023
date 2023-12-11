@@ -25,22 +25,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemFillingInfusionRecipe extends InfusionRecipe {
-    public static final RecipeSerializer<ItemFillingInfusionRecipe> SERIALIZER = new RecipeSerializer<>() {
-        @Override
-        public Codec<ItemFillingInfusionRecipe> codec() {
-            return Codec.unit(ItemFillingInfusionRecipe::new);
-        }
-
-        @Override
-        public ItemFillingInfusionRecipe read(PacketByteBuf buf) {
-            return new ItemFillingInfusionRecipe();
-        }
-
-        @Override
-        public void write(PacketByteBuf buf, ItemFillingInfusionRecipe recipe) {
-
-        }
-    };
+    public static final RecipeSerializer<ItemFillingInfusionRecipe> SERIALIZER = new MagifactureSpecialRecipeSerializer<>(ItemFillingInfusionRecipe::new);
 
     @Override
     public ResourceAmount<FluidVariant> getFluidCost(@Nullable InfuserBlockEntity inventory) {

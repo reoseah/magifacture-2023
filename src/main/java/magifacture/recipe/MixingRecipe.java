@@ -1,11 +1,14 @@
 package magifacture.recipe;
 
+import magifacture.fluid.transfer.MultipleFluidStorage;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 
-public abstract class FluidMixingRecipe implements Recipe<Inventory> {
-    public static final RecipeType<FluidMixingRecipe> TYPE = new RecipeType<>() {
+import java.util.function.Supplier;
+
+public abstract class MixingRecipe<T extends Inventory & Supplier<MultipleFluidStorage>> implements Recipe<T> {
+    public static final RecipeType<MixingRecipe<?>> TYPE = new RecipeType<>() {
         @Override
         public String toString() {
             return "magifacture:fluid_mixing";

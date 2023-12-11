@@ -2,8 +2,10 @@ package magifacture.block.entity;
 
 import lombok.Getter;
 import magifacture.block.MixingColumnBlock;
+import magifacture.block.entity.component.RecipeHandler;
 import magifacture.fluid.transfer.FluidTransferUtils;
 import magifacture.fluid.transfer.MultipleFluidStorage;
+import magifacture.recipe.MixingRecipe;
 import magifacture.screen.MixingColumnScreenHandler;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.BlockState;
@@ -13,6 +15,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.recipe.RecipeType;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -20,7 +24,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class MixingColumnBlockEntity extends MagifactureBlockEntity implements SidedInventory {
+import java.util.Optional;
+import java.util.function.Supplier;
+
+public class MixingColumnBlockEntity extends MagifactureBlockEntity implements SidedInventory, Supplier<MultipleFluidStorage> {
     public static final int INVENTORY_SIZE = 6;
     public static final int SLOT_INPUT = 0, //
             SLOT_OUTPUT = 1, //
@@ -33,6 +40,34 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity implements S
 
     @Getter
     protected MixingColumnFluidStorage fluidStorage = new MixingColumnFluidStorage(this);
+
+    protected RecipeHandler<MixingRecipe<?>, MixingColumnBlockEntity> recipeHandler = new RecipeHandler<>(this) {
+        @SuppressWarnings({"unchecked", "OptionalAssignedToNull"})
+        @Override
+        protected @Nullable Optional<MixingRecipe<?>> findRecipe() {
+            if (this.inventory.world == null) {
+                return null;
+            }
+            return this.inventory.world.getRecipeManager() //
+                    .getFirstMatch((RecipeType<MixingRecipe<MixingColumnBlockEntity>>) (RecipeType<?>) MixingRecipe.TYPE, this.inventory, this.inventory.world) //
+                    .map(RecipeEntry::value);
+        }
+
+        @Override
+        protected boolean canCraft(MixingRecipe<?> recipe) {
+            return true;
+        }
+
+        @Override
+        protected void craftRecipe(MixingRecipe<?> recipe) {
+            ((MixingRecipe<MixingColumnBlockEntity>) recipe).craft(this.inventory, this.inventory.getWorld().getRegistryManager());
+        }
+
+        @Override
+        protected int getRecipeDuration(MixingRecipe<?> recipe) {
+            return 1;
+        }
+    };
 
     protected int extensions = 0;
 
@@ -80,6 +115,8 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity implements S
     public static void tickServer(World world, BlockPos pos, BlockState state, MixingColumnBlockEntity be) {
         FluidTransferUtils.tryDrainItem(be.fluidStorage, be, SLOT_TO_DRAIN, SLOT_DRAINED, Integer.MAX_VALUE);
         FluidTransferUtils.tryFillItem(be.fluidStorage, be, SLOT_TO_FILL, SLOT_FILLED, Integer.MAX_VALUE);
+
+        be.recipeHandler.progress();
     }
 
     @Override
@@ -117,6 +154,11 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity implements S
         return true;
     }
 
+    @Override
+    public MultipleFluidStorage get() {
+        return this.fluidStorage;
+    }
+
     public static class MixingColumnFluidStorage extends MultipleFluidStorage {
         protected final MixingColumnBlockEntity be;
 
@@ -128,6 +170,7 @@ public class MixingColumnBlockEntity extends MagifactureBlockEntity implements S
         @Override
         protected void onFinalCommit() {
             super.onFinalCommit();
+            this.be.recipeHandler.resetCachedRecipe();
             this.be.markDirty();
         }
 

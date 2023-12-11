@@ -11,12 +11,12 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-public class MoltenMagicCrystalBlock extends FluidBlock {
-    public static final FluidBlock INSTANCE = new MoltenMagicCrystalBlock(MagicCrystalFluid.Still.INSTANCE, Magifacture.INFUSED_STONE, AbstractBlock.Settings.copy(Blocks.LAVA));
+public class MagicCrystalFluidBlock extends FluidBlock {
+    public static final FluidBlock INSTANCE = new MagicCrystalFluidBlock(MagicCrystalFluid.Still.INSTANCE, Magifacture.INFUSED_STONE, AbstractBlock.Settings.copy(Blocks.LAVA));
 
     public final Block solidified;
 
-    public MoltenMagicCrystalBlock(FlowableFluid fluid, Block solidified, Settings settings) {
+    public MagicCrystalFluidBlock(FlowableFluid fluid, Block solidified, Settings settings) {
         super(fluid, settings);
         this.solidified = solidified;
     }

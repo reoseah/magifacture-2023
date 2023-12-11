@@ -50,7 +50,7 @@ public class Magifacture implements ModInitializer {
         LOGGER.info("Initializing...");
 
         Registry.register(Registries.BLOCK, "magifacture:experience", ExperienceBlock.INSTANCE);
-        Registry.register(Registries.BLOCK, "magifacture:molten_magic_crystal", MoltenMagicCrystalBlock.INSTANCE);
+        Registry.register(Registries.BLOCK, "magifacture:molten_magic_crystal", MagicCrystalFluidBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:crematorium", CrematoriumBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:alembic", AlembicBlock.INSTANCE);
         Registry.register(Registries.BLOCK, "magifacture:infuser", InfuserBlock.INSTANCE);
@@ -82,12 +82,7 @@ public class Magifacture implements ModInitializer {
                 return Text.translatable("block.magifacture.experience").formatted(Rarity.UNCOMMON.formatting);
             }
         });
-        FluidVariantAttributes.register(MagicCrystalFluid.Still.INSTANCE, new FluidVariantAttributeHandler() {
-            @Override
-            public Text getName(FluidVariant fluidVariant) {
-                return Text.translatable("block.magifacture.molten_magic_crystal").formatted(Rarity.UNCOMMON.formatting);
-            }
-        });
+        FluidVariantAttributes.register(MagicCrystalFluid.Still.INSTANCE, MagicCrystalFluid.VariantAttributes.INSTANCE);
 
         Registry.register(Registries.ITEM, "magifacture:crematorium", CrematoriumBlock.ITEM);
         Registry.register(Registries.ITEM, "magifacture:alembic", AlembicBlock.ITEM);
@@ -146,7 +141,10 @@ public class Magifacture implements ModInitializer {
                     entries.add(MAGIC_CRYSTAL_BLOCK);
 
                     entries.add(ExperienceBucketItem.INSTANCE);
+
                     entries.add(MagicCrystalBucketItem.INSTANCE);
+                    entries.add(MagicCrystalBucketItem.createStack(100, 100, 100));
+
                     entries.add(ASH);
                     entries.add(MAGIC_CRYSTAL);
                 }) //
@@ -155,10 +153,12 @@ public class Magifacture implements ModInitializer {
 
         Registry.register(Registries.RECIPE_TYPE, "magifacture:cremation", CremationRecipe.TYPE);
         Registry.register(Registries.RECIPE_TYPE, "magifacture:infusion", InfusionRecipe.TYPE);
+        Registry.register(Registries.RECIPE_TYPE, "magifacture:mixing", MixingRecipe.TYPE);
 
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:cremation", SimpleCremationRecipe.SERIALIZER);
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:item_filling_infusion", ItemFillingInfusionRecipe.SERIALIZER);
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:shaped_infusion", ShapedInfusionRecipe.SERIALIZER);
+        Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:magic_crystal_mixing", MagicCrystalMixingRecipe.SERIALIZER);
 
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:crematorium", CrematoriumScreenHandler.TYPE);
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:alembic", AlembicScreenHandler.TYPE);

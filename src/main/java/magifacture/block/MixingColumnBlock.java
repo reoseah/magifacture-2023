@@ -70,15 +70,6 @@ public class MixingColumnBlock extends MagifactureBlock {
         updateBlockEntities(state, world, pos);
         super.onStateReplaced(state, world, pos, newState, moved);
     }
-//
-//    @Override
-//    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-//        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
-//        if (pos.getX() == sourcePos.getX() && pos.getZ() == sourcePos.getZ() //
-//                && sourceBlock == this) {
-//            updateBlockEntity(state, world, pos);
-//        }
-//    }
 
     private static void updateBlockEntities(BlockState state, World world, BlockPos pos) {
         BlockPos lowest = pos;
