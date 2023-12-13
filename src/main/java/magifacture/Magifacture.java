@@ -158,6 +158,7 @@ public class Magifacture implements ModInitializer {
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:cremation", SimpleCremationRecipe.SERIALIZER);
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:item_filling_infusion", ItemFillingInfusionRecipe.SERIALIZER);
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:shaped_infusion", ShapedInfusionRecipe.SERIALIZER);
+        Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:mixing", SimpleMixingRecipe.SERIALIZER);
         Registry.register(Registries.RECIPE_SERIALIZER, "magifacture:magic_crystal_mixing", MagicCrystalMixingRecipe.SERIALIZER);
 
         Registry.register(Registries.SCREEN_HANDLER, "magifacture:crematorium", CrematoriumScreenHandler.TYPE);

@@ -1,0 +1,21 @@
+{
+  "type": "magifacture:mixing",
+  "input": [
+	{
+	  "variant": {
+		"fluid": "minecraft:lava"
+	  }
+	},
+	{
+	  "variant": {
+		"fluid": "minecraft:water"
+	  }
+	}
+  ],
+  "result": {
+	"variant": {
+	  "fluid": "magifacture:experience"
+	},
+	"amount": 2
+  }
+}

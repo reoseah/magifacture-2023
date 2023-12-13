@@ -2,6 +2,8 @@ package magifacture.fluid.transfer;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.objects.Object2LongLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import magifacture.item.transfer.InventorySlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -24,16 +26,16 @@ import java.util.Optional;
 
 public class FluidTransferUtils {
     public static final Codec<FluidVariant> FLUID_VARIANT_CODEC = RecordCodecBuilder //
-            .create(instance -> instance.group(
-                    Registries.FLUID.getCodec().fieldOf("fluid").forGetter(FluidVariant::getFluid),
-                    NbtCompound.CODEC.optionalFieldOf("nbt").forGetter(variant -> Optional.ofNullable(variant.getNbt()))
-            ).apply(instance, (fluid, optionalNbt) -> FluidVariant.of(fluid, optionalNbt.orElse(null))));
+            .create(instance -> instance.group( //
+                            Registries.FLUID.getCodec().fieldOf("fluid").forGetter(FluidVariant::getFluid), //
+                            NbtCompound.CODEC.optionalFieldOf("nbt").forGetter(variant -> Optional.ofNullable(variant.getNbt()))) //
+                    .apply(instance, (fluid, optionalNbt) -> FluidVariant.of(fluid, optionalNbt.orElse(null))));
 
     public static final Codec<ResourceAmount<FluidVariant>> FLUID_AMOUNT_CODEC = RecordCodecBuilder //
-            .create(instance -> instance.group(
-                    FLUID_VARIANT_CODEC.fieldOf("variant").forGetter(ResourceAmount::resource),
-                    Codec.LONG.fieldOf("amount").forGetter(ResourceAmount::amount)
-            ).apply(instance, ResourceAmount::new));
+            .create(instance -> instance.group( //
+                            FLUID_VARIANT_CODEC.fieldOf("variant").forGetter(ResourceAmount::resource), //
+                            Codec.LONG.fieldOf("amount").forGetter(ResourceAmount::amount)) //
+                    .apply(instance, ResourceAmount::new));
 
     public static boolean canFill(ItemStack stack) {
         var ctx = ContainerItemContext.withConstant(stack);

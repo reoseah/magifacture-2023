@@ -1,0 +1,26 @@
+{
+  "type": "magifacture:mixing",
+  "input": [
+	{
+	  "variant": {
+		"fluid": "minecraft:lava"
+	  }
+	},
+	{
+	  "variant": {
+		"fluid": "magifacture:experience"
+	  }
+	}
+  ],
+  "result": {
+	"variant": {
+	  "fluid": "magifacture:molten_magic_crystal",
+	  "nbt": {
+		"Power": 10,
+		"Purity": 10,
+		"Heat": 0
+	  }
+	},
+	"amount": 2
+  }
+}
